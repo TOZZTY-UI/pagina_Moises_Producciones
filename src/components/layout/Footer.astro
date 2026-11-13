@@ -24,8 +24,8 @@ interface Props {
 }
 
 const {
-  wordmark = "SAXEVENTOS",
-  brand = "saxeventos",
+  wordmark = "SAXEVENTOS PRODUCCIONES",
+  brand = "saxeventos producciones",
   columns = [
     {
       title: "Explora",
@@ -39,7 +39,7 @@ const {
       ],
     },
   ],
-  copyright = "©" + new Date().getFullYear() + " saxeventos.",
+  copyright = "©" + new Date().getFullYear() + " saxeventos producciones.",
   backToTop = true,
 } = Astro.props;
 
@@ -168,11 +168,18 @@ const quotes = [
       </div>
       <h2 class="dcf-wordmark" aria-label={wordmark}>
         {
-          Array.from(wordmark.toUpperCase()).map((letter, i) => (
-            <span aria-hidden="true" style={`--i:${i}`}>
-              {letter === " " ? "\u00a0" : letter}
-            </span>
-          ))
+          wordmark
+            .toUpperCase()
+            .split(/\s+/)
+            .map((word, wordIndex) => (
+              <span class="dcf-wordmark__line" aria-hidden="true">
+                {Array.from(word).map((letter, letterIndex) => (
+                  <span class="dcf-wordmark__letter" style={`--i:${wordIndex * 20 + letterIndex}`}>
+                    {letter}
+                  </span>
+                ))}
+              </span>
+            ))
         }
       </h2>
       <div class="dcf-bubble" role="status" aria-live="polite" hidden></div>

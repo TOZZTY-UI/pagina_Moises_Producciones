@@ -121,20 +121,28 @@
   }
   .dcf-wordmark {
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
     margin: 0;
     font:
-      900 clamp(35px, 12vw, 180px)/0.8 "Arial Black",
+      900 clamp(35px, 10vw, 150px)/0.8 "Arial Black",
       sans-serif;
     letter-spacing: -0.055em;
     white-space: nowrap;
   }
-  .dcf-wordmark span {
+  .dcf-wordmark__line {
+    display: block;
+  }
+  .dcf-wordmark__line + .dcf-wordmark__line {
+    font-size: 0.7em;
+  }
+  .dcf-wordmark__letter {
     display: inline-block;
     transition: transform .25s cubic-bezier(.22, 1, .36, 1);
   }
   @media (hover: hover) {
-    .dcf-wordmark span:hover {
+    .dcf-wordmark__letter:hover {
       transform: rotate(-4deg) translateY(-5px);
     }
   }
@@ -319,7 +327,7 @@
     }
   }
   @media (max-width: 860px) {
-    .dcf-wordmark.is-visible span {
+    .dcf-wordmark.is-visible .dcf-wordmark__letter {
       animation: letter-wave 3s ease-in-out calc(var(--i) * 0.1s) infinite;
     }
     .dcf-top {
