@@ -1,0 +1,48 @@
+---
+import AnimatedSidebar from '../components/ux/AnimatedSidebar.astro';
+import Footer from '../components/layout/Footer.astro';
+import '../styles/components/ui/interactive-hover-button.css';
+
+const title = 'Moisés Producciones';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <AnimatedSidebar>
+      <main class="empty-page" aria-label={title}>
+        <h1>{title}</h1>
+      </main>
+      <Footer />
+    </AnimatedSidebar>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --negro: #11100e;
+    --negro-70: rgb(17 16 14 / 70%);
+    --dorado: #c9a55a;
+    --marfil: #f4eee2;
+    --color-bg: #f4eee2;
+    --color-card: #2b2924;
+    --color-text-muted: #9a958b;
+    font-family: system-ui, sans-serif;
+    color: var(--negro);
+    background: var(--color-bg);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; min-width: 320px; }
+  .empty-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+  }
+  .empty-page h1 { font-size: clamp(1.5rem, 4vw, 3rem); }
+</style>

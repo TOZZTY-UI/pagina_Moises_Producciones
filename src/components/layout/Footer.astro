@@ -1,0 +1,211 @@
+---
+import { socialLinks } from "../../data/socialLinks";
+import { navigation, footerLinks } from "../../data/navigation";
+import { Image } from "astro:assets";
+import firma from "../../assets/images/Firma.png";
+interface Link {
+  label: string;
+  href?: string;
+}
+interface Column {
+  title: string;
+  links: Link[];
+}
+interface Action extends Link {
+  variant?: "solid" | "outline";
+}
+interface Props {
+  wordmark?: string;
+  brand?: string;
+  columns?: Column[];
+  actions?: Action[];
+  copyright?: string;
+  backToTop?: boolean;
+}
+
+const {
+  wordmark = "SAXEVENTOS",
+  brand = "saxeventos",
+  columns = [
+    {
+      title: "Explora",
+      links: footerLinks,
+    },
+    {
+      title: "Información",
+      links: [
+        { label: "Preguntas Frecuentes", href: navigation.find((link) => link.id === 'preguntas-frecuentes')?.href },
+        ...navigation.filter((link) => link.id === 'terminos'),
+      ],
+    },
+  ],
+  copyright = "©" + new Date().getFullYear() + " saxeventos.",
+  backToTop = true,
+} = Astro.props;
+
+const doodles = [
+  "𝅜",
+  "𝅝",
+  "𝅗𝅥",
+  "𝅘𝅥",
+  "𝅘𝅥𝅮",
+  "𝅘𝅥𝅯",
+  "𝅘𝅥𝅰",
+  "𝅘𝅥𝅱",
+  "𝅘𝅥𝅱",
+  "𝅘𝅥𝅲",
+  "𝄞",
+  "𝄢",
+  "♭",
+  "♮",
+  "♯",
+];
+
+const quotes = [
+  {
+    text: "La música es siempre un refugio seguro en un mundo incierto.",
+    author: "Charlie Parker",
+  },
+  {
+    text: "Sin música, la vida sería un error.",
+    author: "Friedrich Nietzsche",
+  },
+  {
+    text: "La música constituye una revelación más alta que ninguna filosofía.",
+    author: "Ludwig van Beethoven",
+  },
+  {
+    text: "La música expresa aquello que no puede decirse con palabras pero no puede permanecer en silencio.",
+    author: "Ludwig van Beethoven",
+  },
+  {
+    text: "La música puede cambiar el mundo porque puede cambiar a las personas.",
+    author: "Bono",
+  },
+  {
+    text: "La música es un viaje emocional que nos conecta con nuestros sentimientos más profundos.",
+    author: "Charlie Parker",
+  },
+  {
+    text: "El arte de tocar el saxofón es como contar una historia sin palabras.",
+    author: "Charlie Parker",
+  },
+  {
+    text: "La música es el lenguaje del alma, es lo que nos hace sentir más vivos.",
+    author: "Charlie Parker",
+  },
+  {
+    text: "La música es capaz de sanar heridas y elevar el espíritu como nada más en el mundo.",
+    author: "Charlie Parker",
+  },
+];
+---
+
+<footer class="dcf" data-footer>
+  <div class="dcf-top">
+    <div class="dcf-brand">
+      <Image src={firma} alt={`Firma de ${brand}`} width={240} format="webp" loading="lazy" />
+    </div>
+    <div
+      class="dcf-quote"
+      data-quote-rotator
+      data-quotes={JSON.stringify(quotes)}
+      aria-live="polite"
+    >
+      <blockquote>{quotes[0].text}</blockquote>
+      {quotes[0].author && <cite>— {quotes[0].author}</cite>}
+    </div>
+    {
+      columns.length > 0 && (
+        <nav class="dcf-cols" aria-label="Footer">
+          {columns.map((column) => (
+            <div>
+              <h3>{column.title}</h3>
+              <ul>
+                {column.links.map((link) => (
+                  <li>
+                    {link.href ? (
+                      <a href={link.href}>{link.label}</a>
+                    ) : (
+                      <span>{link.label}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          {
+            socialLinks.length > 0 && (
+              <div class="dcf-social-column">
+                <h3>Redes sociales</h3>
+                <ul aria-label="Redes sociales">
+                  {socialLinks.map((link) => (
+                    <li>
+                      <a href={link.url} aria-label={link.name} title={link.name}>
+                        <span class="social-icon" set:html={link.icon} aria-hidden="true" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+        </nav>
+      )
+    }
+  </div>
+
+  <div class="dcf-world">
+    <div class="dcf-stage">
+      <div class="dcf-doodles" aria-hidden="true">
+        {
+          doodles.map((doodle, i) => (
+            <span style={`--x:${5 + i * 12}%;--delay:${i * -0.8}s`}>
+              {doodle}
+            </span>
+          ))
+        }
+      </div>
+      <h2 class="dcf-wordmark" aria-label={wordmark}>
+        {
+          Array.from(wordmark.toUpperCase()).map((letter, i) => (
+            <span aria-hidden="true" style={`--i:${i}`}>
+              {letter === " " ? "\u00a0" : letter}
+            </span>
+          ))
+        }
+      </h2>
+      <div class="dcf-bubble" role="status" aria-live="polite" hidden></div>
+    </div>
+  </div>
+  <br />
+  <div class="dcf-bar">
+    <p>{copyright}</p>
+    {
+      socialLinks.length > 0 && (
+        <ul class="dcf-bar__social" aria-label="Social media">
+          {socialLinks.map((link) => (
+            <li>
+              <a href={link.url} aria-label={link.name} title={link.name}>
+                <span class="social-icon" set:html={link.icon} aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    {
+      backToTop && (
+        <button type="button" class="dcf-totop" data-to-top>
+          Subir ↑
+        </button>
+      )
+    }
+  </div>
+</footer>
+
+<script src="../../scripts/components/layout/footer.ts"></script>
+
+<style>
+  @import "../../styles/components/layout/footer.css";
+</style>
