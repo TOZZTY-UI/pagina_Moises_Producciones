@@ -60,6 +60,7 @@
 }
 
 .island-nav[data-phase='closing-height'] .island-nav__shell {
+  min-height: 34px;
   transition-duration: 700ms;
 }
 
