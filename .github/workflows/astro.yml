@@ -3,7 +3,7 @@ name: Deploy Producciones SaxEventos Astro
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
