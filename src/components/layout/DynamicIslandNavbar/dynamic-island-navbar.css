@@ -22,7 +22,7 @@
   border: 1px solid transparent;
   border-radius: 999px;
   background:
-    linear-gradient(#09070e, #09070e) padding-box,
+    linear-gradient(#000000, #000000) padding-box,
     linear-gradient(110deg, #6f2bd1 0%, #d19aff 36%, #7d39e8 68%, #c178ff 100%) border-box;
   box-shadow:
     0 0 7px rgb(193 120 255 / 75%),
@@ -50,7 +50,7 @@
   border-radius: 28px;
   border-color: transparent;
   background:
-    linear-gradient(#11100e, #11100e) padding-box,
+    linear-gradient(#000000, #000000) padding-box,
     linear-gradient(110deg, #6f2bd1 0%, #d19aff 36%, #7d39e8 68%, #c178ff 100%) border-box;
   box-shadow:
     0 0 8px rgb(193 120 255 / 68%),
@@ -123,7 +123,7 @@
   width: 38px;
   height: 38px;
   background: var(--island-gold);
-  color: #17130b;
+  color: #000000;
   font-family: Georgia, serif;
   font-size: 20px;
   font-style: italic;
@@ -254,7 +254,7 @@
   margin-top: 10px;
   padding: 0 13px;
   background: var(--island-gold);
-  color: #17130b;
+  color: #000000;
   font-size: 14px;
   font-weight: 700;
   transform: translateY(-8px);
@@ -291,5 +291,5 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .island-nav__shell { background: #11100e; backdrop-filter: none; }
+  .island-nav__shell { background: #000000; backdrop-filter: none; }
 }
