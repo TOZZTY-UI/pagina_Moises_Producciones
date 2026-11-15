@@ -1,0 +1,182 @@
+---
+import { socialLinks } from "../../../data/socialLinks";
+import { navigation, footerLinks } from "../../../data/navigation";
+import quotes from "../../../data/quotes.json";
+import { Image } from "astro:assets";
+import firma from "../../../assets/images/Firma.png";
+interface Link {
+  label: string;
+  href?: string;
+}
+interface Column {
+  title: string;
+  links: Link[];
+}
+interface Action extends Link {
+  variant?: "solid" | "outline";
+}
+interface Props {
+  wordmark?: string;
+  brand?: string;
+  columns?: Column[];
+  actions?: Action[];
+  copyright?: string;
+  backToTop?: boolean;
+}
+
+const {
+  wordmark = "SAXEVENTOS PRODUCCIONES",
+  brand = "saxeventos producciones",
+  columns = [
+    {
+      title: "Explora",
+      links: footerLinks,
+    },
+    {
+      title: "Información",
+      links: [
+        { label: "Preguntas Frecuentes", href: navigation.find((link) => link.id === 'preguntas-frecuentes')?.href },
+        ...navigation.filter((link) => link.id === 'terminos'),
+      ],
+    },
+  ],
+  copyright = "©" + new Date().getFullYear() + " saxeventos producciones.",
+  backToTop = true,
+} = Astro.props;
+
+const doodles = [
+  "𝅜",
+  "𝅝",
+  "𝅗𝅥",
+  "𝅘𝅥",
+  "𝅘𝅥𝅮",
+  "𝅘𝅥𝅯",
+  "𝅘𝅥𝅰",
+  "𝅘𝅥𝅱",
+  "𝅘𝅥𝅱",
+  "𝅘𝅥𝅲",
+  "𝄞",
+  "𝄢",
+  "♭",
+  "♮",
+  "♯",
+];
+
+const quoteData = [
+  ...quotes
+];
+---
+
+<footer class="dcf" data-footer>
+  <div class="dcf-top">
+    <div class="dcf-brand">
+      <Image src={firma} alt={`Firma de ${brand}`} width={240} format="webp" loading="lazy" />
+    </div>
+    <div
+      class="dcf-quote"
+      data-quote-rotator
+      data-quotes={JSON.stringify(quoteData)}
+      aria-live="polite"
+    >
+      <blockquote>{quoteData[0].text}</blockquote>
+      {quoteData[0].author && <cite>— {quoteData[0].author}</cite>}
+    </div>
+    {
+      columns.length > 0 && (
+        <nav class="dcf-cols" aria-label="Footer">
+          {columns.map((column) => (
+            <div>
+              <h3>{column.title}</h3>
+              <ul>
+                {column.links.map((link) => (
+                  <li>
+                    {link.href ? (
+                      <a href={link.href}>{link.label}</a>
+                    ) : (
+                      <span>{link.label}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          {
+            socialLinks.length > 0 && (
+              <div class="dcf-social-column">
+                <h3>Redes sociales</h3>
+                <ul aria-label="Redes sociales">
+                  {socialLinks.map((link) => (
+                    <li>
+                      <a href={link.url} aria-label={link.name} title={link.name}>
+                        <span class="social-icon" set:html={link.icon} aria-hidden="true" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+        </nav>
+      )
+    }
+  </div>
+
+  <div class="dcf-world">
+    <div class="dcf-stage">
+      <div class="dcf-doodles" aria-hidden="true">
+        {
+          doodles.map((doodle, i) => (
+            <span style={`--x:${5 + i * 12}%;--delay:${i * -0.8}s`}>
+              {doodle}
+            </span>
+          ))
+        }
+      </div>
+      <h2 class="dcf-wordmark" aria-label={wordmark}>
+        {
+          wordmark
+            .toUpperCase()
+            .split(/\s+/)
+            .map((word, wordIndex) => (
+              <span class="dcf-wordmark__line" aria-hidden="true">
+                {Array.from(word).map((letter, letterIndex) => (
+                  <span class="dcf-wordmark__letter" style={`--i:${wordIndex * 20 + letterIndex}`}>
+                    {letter}
+                  </span>
+                ))}
+              </span>
+            ))
+        }
+      </h2>
+      <div class="dcf-bubble" role="status" aria-live="polite" hidden></div>
+    </div>
+  </div>
+  <br />
+  <div class="dcf-bar">
+    <p>{copyright}</p>
+    {
+      socialLinks.length > 0 && (
+        <ul class="dcf-bar__social" aria-label="Social media">
+          {socialLinks.map((link) => (
+            <li>
+              <a href={link.url} aria-label={link.name} title={link.name}>
+                <span class="social-icon" set:html={link.icon} aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    {
+      backToTop && (
+        <button type="button" class="dcf-totop" data-to-top>
+          Subir ↑
+        </button>
+      )
+    }
+  </div>
+</footer>
+
+<script src="./Footer.ts"></script>
+
+<style>@import "./Footer.css";</style>

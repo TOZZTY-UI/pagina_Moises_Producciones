@@ -25,4 +25,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://saxeventos.cl/sitemap-index.xml
+Sitemap: https://producciones.saxeventos.cl/sitemap-index.xml
