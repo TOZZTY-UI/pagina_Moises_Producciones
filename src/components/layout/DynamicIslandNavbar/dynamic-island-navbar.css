@@ -18,7 +18,7 @@
   position: relative;
   z-index: 1;
   overflow: clip;
-  min-height: 34px;
+  min-height: 1.25rem;
   border: 1px solid transparent;
   border-radius: 999px;
   background:
@@ -28,6 +28,7 @@
     0 0 7px rgb(193 120 255 / 75%),
     0 0 22px rgb(164 79 255 / 45%),
     0 16px 45px rgb(17 16 14 / 20%);
+  cursor: pointer;
   transition: min-height 700ms cubic-bezier(.22, 1, .36, 1),
     border-color 160ms ease, background 200ms ease, box-shadow 200ms ease;
 }
@@ -36,7 +37,7 @@
 .island-nav[data-phase='expanding-height'],
 .island-nav[data-phase='open'],
 .island-nav[data-phase='closing-height'] {
-  width: min(calc(100% - 32px), 390px);
+  width: min(calc(100% - 2rem), 390px);
 }
 
 .island-nav[data-phase='closing-width'] {
@@ -60,12 +61,12 @@
 }
 
 .island-nav[data-phase='closing-height'] .island-nav__shell {
-  min-height: 34px;
+  min-height: 2rem;
   transition-duration: 700ms;
 }
 
 .island-nav[data-phase='closing-width'] .island-nav__shell {
-  transition-duration: 700ms;
+  transition-duration: 250ms;
 }
 
 .island-nav__title,
@@ -242,9 +243,8 @@
 }
 
 .island-nav__link[data-active='true'] { color: var(--island-gold); }
-.island-nav__link-arrow { opacity: 0; transition: opacity 100ms ease; }
 .island-nav__link:hover .island-nav__link-arrow,
-.island-nav__link[data-active='true'] .island-nav__link-arrow { opacity: 1; }
+.island-nav__link[data-active='true']
 
 .island-nav__contact {
   display: flex;

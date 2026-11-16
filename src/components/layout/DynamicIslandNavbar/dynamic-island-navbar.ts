@@ -1,8 +1,8 @@
-  const nav = document.querySelector<HTMLElement>('[data-island-nav]');
-  const toggle = nav?.querySelector<HTMLButtonElement>('[data-island-toggle]');
+const nav = document.querySelector<HTMLElement>('[data-island-nav]');
   const menu = nav?.querySelector<HTMLElement>('[data-island-menu]');
+  const dragHandle = nav?.querySelector<HTMLElement>('[data-drag-handle]');
 
-  if (nav && toggle && menu) {
+  if (nav && menu && dragHandle) {
     const widthDuration = 700;
     const heightDuration = 700;
     const closeDuration = 700;
@@ -13,8 +13,7 @@
       window.clearTimeout(phaseTimer);
       window.clearTimeout(closeTimer);
       nav.dataset.open = String(open);
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.setAttribute('aria-label', open ? 'Cerrar navegación' : 'Abrir navegación');
+      nav.setAttribute('aria-expanded', String(open));
 
       if (open) {
         nav.dataset.phase = 'expanding-width';
@@ -35,35 +34,12 @@
       }
     };
 
-    toggle.addEventListener('click', () => setOpen(nav.dataset.open !== 'true'));
-
     nav.addEventListener('mouseenter', () => {
       setOpen(true);
     });
 
     nav.addEventListener('mouseleave', () => {
       setOpen(false);
-    });
-
-    nav.addEventListener('focusin', () => setOpen(true));
-
-    nav.addEventListener('focusout', (event) => {
-      if (!nav.contains(event.relatedTarget as Node)) setOpen(false);
-    });
-
-    document.addEventListener('click', (event) => {
-      if (!nav.contains(event.target as Node)) setOpen(false);
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        setOpen(false);
-        toggle.focus();
-      }
-    });
-
-    nav.querySelectorAll<HTMLAnchorElement>('[data-nav-link], .island-nav__contact').forEach((link) => {
-      link.addEventListener('click', () => setOpen(false));
     });
 
     const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
