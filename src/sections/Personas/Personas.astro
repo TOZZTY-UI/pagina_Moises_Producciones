@@ -1,0 +1,39 @@
+---
+import LanyardBadge from "../../components/ux/LanyardBadge/LanyardBadge.astro";
+import personas from "../../data/personas.json";
+
+const imageUrls = import.meta.glob("../../assets/**/*", {
+  eager: true,
+  query: "?url",
+  import: "default",
+}) as Record<string, string>;
+
+const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
+---
+<div class="personas-grid">
+  {personas.map((person) => {
+    return (
+      <LanyardBadge
+        title={person.title}
+        subtitle={person.subtitle}
+        name={person.name}
+        role={person.role}
+        frontImage={resolveImage(person.LanyardBadgefront)}
+        frontImageHover={resolveImage(person.LanyardBadgehover)}
+        frontImageAlt={person.frontImageAlt}
+        profileHref={`/personas/${person.slug}`}
+        strapText="hola"
+        strapLabel="PRODUCCIONES"
+        strapColor="#141312"
+        inkColor="#b59a6c"
+        cardColor="#e8dfcc"
+        cardWidth={240}
+        height="100svh"
+        flipButton={false}
+      />
+    );
+  })}
+</div>
+<style>
+@import "./Personas.css";
+</style>

@@ -1,0 +1,101 @@
+---
+import DynamicIslandNavbar from '../../components/ux/DynamicIslandNavbar/DynamicIslandNavbar.astro';
+import Preloader from '../../components/ux/Preloader/Preloader.astro';
+import Footer from '../../components/layout/Footer/Footer.astro';
+
+
+interface Props {
+  title?: string;
+  showPreloader?: boolean;
+}
+
+const {
+  title = 'Moisés Producciones',
+  showPreloader = true,
+} = Astro.props;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body>
+    {showPreloader && <Preloader />}
+    <DynamicIslandNavbar />
+    <slot />
+    <Footer />
+    <div id="page-curtain" aria-hidden="true"></div>
+  </body>
+
+</html>
+
+<script is:inline>
+  const curtain = document.querySelector('#page-curtain');
+  let animating = false;
+
+  document.addEventListener('click', async (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    const link = target.closest('a[href]');
+    if (!(link instanceof HTMLAnchorElement) || link.target === '_blank') return;
+    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (link.origin !== window.location.origin || link.hasAttribute('download')) return;
+
+    const destination = new URL(link.href);
+    if (destination.pathname === window.location.pathname && destination.hash) return;
+    if (!curtain || animating) return;
+
+    event.preventDefault();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.location.href = destination.href;
+      return;
+    }
+
+    animating = true;
+
+    const isBackward = link.dataset.transitionDirection === 'backward'
+      || (destination.pathname === '/' && !destination.hash);
+    const initial = isBackward
+      ? 'polygon(160% 0, 130% 0, 105% 100%, 160% 100%)'
+      : 'polygon(-60% 0, -30% 0, -5% 100%, -60% 100%)';
+    const covered = isBackward
+      ? 'polygon(160% 0, -30% 0, -55% 100%, 160% 100%)'
+      : 'polygon(-60% 0, 130% 0, 155% 100%, -60% 100%)';
+
+    curtain.style.clipPath = initial;
+    const animation = curtain.animate(
+      [{ clipPath: initial }, { clipPath: covered }],
+      {
+        duration: 650,
+        easing: 'cubic-bezier(0.77, 0, 0.18, 1)',
+        fill: 'forwards',
+      },
+    );
+
+    await animation.finished;
+    window.location.href = destination.href;
+  });
+
+</script>
+
+<style>
+  @import 'src\layouts\Landing\LandingPage.css';
+
+  #page-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #151515;
+    pointer-events: none;
+    clip-path: polygon(-60% 0, -30% 0, -5% 100%, -60% 100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #page-curtain {
+      display: none;
+    }
+  }
+</style>

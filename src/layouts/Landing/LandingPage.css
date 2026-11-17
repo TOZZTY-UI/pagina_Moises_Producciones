@@ -1,0 +1,143 @@
+:root {
+  --negro: #11100e;
+  --negro-70: rgb(17 16 14 / 70%);
+  --dorado: #c9a55a;
+  --marfil: #f4eee2;
+  --color-bg: #f4eee2;
+  --color-card: #2b2924;
+  --color-text-muted: #9a958b;
+  --burdeos: #6f2b2b;
+  font-family: system-ui, sans-serif;
+  color: var(--negro);
+  background: var(--color-bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+.empty-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  display: grid;
+  place-items: center start;
+  padding: clamp(8rem, 18vw, 12rem) clamp(1.5rem, 9vw, 9rem) 7rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 76% 38%, rgb(201 165 90 / 18%), transparent 22rem),
+    var(--color-bg);
+}
+
+.empty-page::after {
+  position: absolute;
+  z-index: -1;
+  right: -10vw;
+  bottom: -30vw;
+  width: min(70vw, 720px);
+  aspect-ratio: 1;
+  border: 1px solid rgb(17 16 14 / 12%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5vw rgb(17 16 14 / 2%), 0 0 0 10vw rgb(17 16 14 / 2%);
+  content: '';
+}
+
+.landing-intro {
+  max-width: 660px;
+}
+
+.landing-kicker {
+  margin: 0 0 1.5rem;
+  color: var(--dorado);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.landing-intro h1 {
+  margin: 0;
+  font-size: clamp(3.4rem, 8vw, 8.5rem);
+  line-height: .91;
+  letter-spacing: -.075em;
+}
+
+.landing-intro h1 em {
+  color: var(--dorado);
+  font-family: Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -.08em;
+}
+
+.landing-copy {
+  max-width: 32ch;
+  margin: 2.3rem 0 2rem;
+  color: var(--color-text-muted);
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  line-height: 1.55;
+}
+
+.landing-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .9rem;
+  padding: .85rem 1.1rem;
+  border: 1px solid var(--negro);
+  border-radius: 99px;
+  color: var(--negro);
+  font-size: .9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+.landing-cta span {
+  color: var(--dorado);
+  font-size: 1.1rem;
+}
+
+.landing-cta:hover {
+  background: var(--negro);
+  color: var(--marfil);
+}
+
+.landing-cta:focus-visible {
+  outline: 2px solid var(--dorado);
+  outline-offset: 4px;
+}
+
+@media (max-width: 520px) {
+  .empty-page {
+    min-height: 88vh;
+    padding-inline: 1.25rem;
+  }
+
+  .landing-intro h1 {
+    font-size: clamp(3.2rem, 17vw, 5.4rem);
+  }
+}
+
+
+
+  #page-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #151515;
+    pointer-events: none;
+    clip-path: polygon(-60% 0, -30% 0, -5% 100%, -60% 100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #page-curtain {
+      display: none;
+    }
+  }

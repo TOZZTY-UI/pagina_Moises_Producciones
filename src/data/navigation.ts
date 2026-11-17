@@ -3,6 +3,8 @@
 export interface NavigationLink {
   /** Identificador interno del enlace. */
   id: string;
+  /** Segmento legible usado para generar la ruta dinámica. */
+  slug: string;
   /** Texto visible para las personas usuarias. */
   label: string;
   /** Ruta de destino del enlace. */
@@ -16,14 +18,14 @@ export interface NavigationLink {
 }
 
 export const navigation: NavigationLink[] = [
-  { id: 'inicio', label: 'Inicio', href: '/', icon: 'home', showInSidebar: true },
-  { id: 'sobreMi', label: 'Sobre Mí', href: '/sobre-mi', icon: 'user', showInSidebar: true, footerOrder: 0 },
-  { id: 'galeria', label: 'Galería', href: '/galeria', icon: 'image', showInSidebar: true, footerOrder: 2 },
-  { id: 'servicios', label: 'Servicios', href: '/servicios', icon: 'music', showInSidebar: true, footerOrder: 3 },
-  { id: 'repertorio', label: 'Repertorio Musical', href: '/repertorio', icon: 'list', showInSidebar: true },
-  { id: 'contacto', label: 'Contacto', href: '/contacto', icon: 'mail', showInSidebar: true, footerOrder: 4 },
-  { id: 'preguntas-frecuentes', label: 'Preguntas Frecuentes', href: '/preguntas-frecuentes', icon: 'help', showInSidebar: false },
-  { id: 'terminos', label: 'Términos y Condiciones', href: '/terminos-y-condiciones', icon: 'info', showInSidebar: false },
+  { id: 'inicio', slug: '', label: 'Inicio', href: '/', icon: 'home', showInSidebar: true },
+  { id: 'sobreMi', slug: 'sobre-mi', label: 'Sobre Mí', href: '/sobre-mi', icon: 'user', showInSidebar: true, footerOrder: 0 },
+  { id: 'galeria', slug: 'galeria', label: 'Galería', href: '/galeria', icon: 'image', showInSidebar: true, footerOrder: 2 },
+  { id: 'servicios', slug: 'servicios', label: 'Servicios', href: '/servicios', icon: 'music', showInSidebar: true, footerOrder: 3 },
+  { id: 'repertorio', slug: 'repertorio', label: 'Repertorio Musical', href: '/repertorio', icon: 'list', showInSidebar: true },
+  { id: 'contacto', slug: 'contacto', label: 'Contacto', href: '/contacto', icon: 'mail', showInSidebar: true, footerOrder: 4 },
+  { id: 'preguntas-frecuentes', slug: 'preguntas-frecuentes', label: 'Preguntas Frecuentes', href: '/preguntas-frecuentes', icon: 'help', showInSidebar: false },
+  { id: 'terminos', slug: 'terminos-y-condiciones', label: 'Términos y Condiciones', href: '/terminos-y-condiciones', icon: 'info', showInSidebar: false },
 ];
 
 export const sidebarLinks = navigation.filter((link) => link.showInSidebar);

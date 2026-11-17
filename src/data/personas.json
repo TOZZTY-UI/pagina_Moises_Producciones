@@ -1,0 +1,35 @@
+[
+  {
+    "slug": "saxeventos",
+    "name": "Moisés Larenas",
+    "role": "Saxofinista",
+    "title": "Saxofonista",
+    "subtitle": "",
+    "description": "",
+    "LanyardBadgefront": "../../assets/MoisesLarenas/Perfil.jpeg",
+    "LanyardBadgehover": "../../assets/MoisesLarenas/Hover.png",
+    "frontImageAlt": "Moisés Larenas"
+  },
+  {
+    "slug": "felipe-montupil",
+    "name": "Felipe Montupil",
+    "role": "Fotógrafo",
+    "title": "Fotógrafo",
+    "subtitle": "",
+    "description": "",
+    "LanyardBadgefront": "../../assets/FelipeMontupil/PERFIL.png",
+    "LanyardBadgehover": "../../assets/FelipeMontupil/Hover.png",
+    "frontImageAlt": "Felipe Montupil"
+  },
+  {
+    "slug": "dgviolinista",
+    "name": "Diego García",
+    "role": "Violínista",
+    "title": "Violinista",
+    "subtitle": "",
+    "description": "",
+    "LanyardBadgefront": "../../assets/DGviolinista/Perfil.jpg",
+    "LanyardBadgehover": "../../assets/DGviolinista/Hover.JPG",
+    "frontImageAlt": "Diego García"
+  }
+]

@@ -1,0 +1,12 @@
+
+  .personas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  @media (max-width: 800px) {
+    .personas-grid {
+      grid-template-columns: 1fr;
+    }
+  }

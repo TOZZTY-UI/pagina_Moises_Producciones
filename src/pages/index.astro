@@ -1,11 +1,14 @@
 ---
-import LandingPage from '../layouts/LandingPage.astro';
-
-
+import LandingPage from '../layouts/Landing/LandingPage.astro';
 import Hero from '../components/layout/Hero/Hero.astro';
 import Footer from '../components/layout/Footer/Footer.astro';
+import Personas from '../sections/Personas/Personas.astro';
+
 ---
 <LandingPage>
+  <main id="main-content">
     <Hero />
-    <Footer />
+    <Personas />
+  </main>
+  <Footer />
 </LandingPage>

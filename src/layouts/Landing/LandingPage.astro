@@ -1,0 +1,37 @@
+---
+import Preloader from '../../components/ux/Preloader/Preloader.astro';
+import Footer from '../../components/layout/Footer/Footer.astro';
+
+
+
+interface Props {
+  title?: string;
+  showPreloader?: boolean;
+}
+
+const {
+  title = 'Moisés Producciones',
+  showPreloader = true,
+} = Astro.props;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body>
+    {/* {showPreloader && <Preloader />} */}
+    <slot />
+    <div id="page-curtain" aria-hidden="true"></div>
+    <Footer />
+
+  </body>
+</html>
+
+<script src="./LandingPage.ts"></script>
+
+<style>
+  @import './LandingPage.css';
+</style>

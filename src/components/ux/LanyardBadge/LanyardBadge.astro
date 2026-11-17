@@ -1,0 +1,191 @@
+---
+/**
+   * LanyardBadge.astro — Conversión nativa de React a Astro del componente original.
+   * Sin React, Tailwind ni dependencias externas. Física Verlet + canvas + tarjeta 3D.
+   * Personaliza el contenido usando los props, una imagen frontal o <div slot="front">/<div slot="back">.
+ */
+interface Props {
+  title?: string;
+  subtitle?: string;
+  name?: string;
+  role?: string;
+  frontImage?: string;
+  frontImageHover?: string;
+  frontImageAlt?: string;
+  profileHref?: string;
+  profileLabel?: string;
+  strapText?: string;
+  strapLabel?: string;
+  strapColor?: string;
+  inkColor?: string;
+  cardColor?: string;
+  flipButton?: boolean;
+  cardWidth?: number;
+  height?: string;
+  className?: string;
+}
+
+const {
+  title = 'The Future Is Handmade',
+  subtitle = 'Design Week · Vol. 2 · 2026',
+  name = 'Alex Morgan',
+  role = 'Documentation',
+  frontImage,
+  frontImageHover,
+  frontImageAlt = '',
+  profileHref,
+  profileLabel = 'Ver perfil',
+  strapText = 'the future is handmade',
+  strapLabel = 'DESIGN WEEK 2026',
+  strapColor = '#141312',
+  inkColor = '#b59a6c',
+  cardColor = '#e8dfcc',
+  flipButton = true,
+  cardWidth = 240,
+  height = '100svh',
+  className = '',
+} = Astro.props;
+
+const cw = Number.isFinite(cardWidth) && cardWidth > 0 ? cardWidth : 240;
+const ch = Math.round(cw * 1.5);
+const ringR = Math.max(7, Math.round(cw * 0.036));
+const clipH = Math.round(cw * 0.1);
+const s = cw / 240;
+const angles = Array.from({ length: 16 }, (_, i) => i * 22.5);
+const hasFront = Astro.slots.has('front');
+const hasBack = Astro.slots.has('back');
+import './LanyardBadge.css';
+---
+<section
+  class:list={['lanyard-root', className]}
+  style={`height:${height};--badge-width:${cw}px;--badge-height:${ch}px;--badge-ring:${ringR}px;--badge-clip:${clipH}px;--badge-strap:${strapColor};--badge-ink:${inkColor};--badge-card:${cardColor}`}
+  data-lanyard-badge
+  data-card-width={cw}
+  data-strap-text={strapText}
+  data-strap-label={strapLabel}
+  data-strap-color={strapColor}
+  data-ink-color={inkColor}
+>
+  <canvas class="lanyard-canvas" aria-hidden="true"></canvas>
+
+  <div
+    class="lanyard-card"
+    role="button"
+    tabindex="0"
+    aria-label="Credencial interactiva. Arrastra para balancear y pulsa para girar."
+    aria-pressed="false"
+  >
+    <div class="badge-clip" aria-hidden="true"></div>
+    <div class="lanyard-inner">
+      <div class="badge-face badge-front">
+        {hasFront ? (
+          <slot name="front" />
+        ) : frontImage ? (
+          <>
+            <img class="badge-image" src={frontImage} alt={frontImageAlt} />
+            {frontImageHover && (
+              <img class="badge-image badge-image--hover" src={frontImageHover} alt="" aria-hidden="true" />
+            )}
+          </>
+        ) : (
+          <div class="front-design" style={`background:${cardColor};color:${inkColor}`}>
+            <svg class="ornament" viewBox="-100 -100 200 200" fill="none" stroke="currentColor" stroke-width="1.4"
+              style={`width:${300*s}px;right:${-130*s}px;top:${100*s}px`} aria-hidden="true">
+              <circle r="96" /><circle r="86" /><circle r="60" /><circle r="25" />
+              {angles.map((a) => <ellipse cx="0" cy="-73" rx="6.5" ry="12" transform={`rotate(${a})`} />)}
+              {angles.map((a) => <circle cx="0" cy="-91" r="1.8" fill="currentColor" transform={`rotate(${a + 11.25})`} />)}
+              {angles.slice(0, 8).map((_, i) => <path d="M0 -25 C 12 -38, 10 -50, 0 -58 C -10 -50, -12 -38, 0 -25" transform={`rotate(${i * 45})`} />)}
+              <circle r="6" fill="currentColor" />
+            </svg>
+            <svg class="ornament" viewBox="-100 -100 200 200" fill="none" stroke="currentColor" stroke-width="1.4"
+              style={`width:${210*s}px;left:${-40*s}px;bottom:${-70*s}px;opacity:.8`} aria-hidden="true">
+              <circle r="96" /><circle r="86" /><circle r="60" /><circle r="25" />
+              {angles.map((a) => <ellipse cx="0" cy="-73" rx="6.5" ry="12" transform={`rotate(${a})`} />)}
+              {angles.map((a) => <circle cx="0" cy="-91" r="1.8" fill="currentColor" transform={`rotate(${a + 11.25})`} />)}
+              {angles.slice(0, 8).map((_, i) => <path d="M0 -25 C 12 -38, 10 -50, 0 -58 C -10 -50, -12 -38, 0 -25" transform={`rotate(${i * 45})`} />)}
+              <circle r="6" fill="currentColor" />
+            </svg>
+            <svg class="badge-arrow" viewBox="0 0 20 200" fill="none" stroke="currentColor" stroke-width="1.4"
+              style={`width:${14*s}px;height:${250*s}px;left:${26*s}px;top:${110*s}px;transform:rotate(-14deg)`} aria-hidden="true">
+              <path d="M10 4 L10 196 M3 18 L10 4 L17 18 M4 182 L10 170 L16 182 M4 194 L10 182 L16 194" />
+            </svg>
+            <div class="front-copy" style={`left:${22*s}px;top:${34*s}px;right:${22*s}px`}>
+              <div class="front-title" style={`font-size:${25*s}px`}>{title}</div>
+              <div class="front-subtitle" style={`font-size:${6.5*s}px;margin-top:${6*s}px`}>{subtitle}</div>
+            </div>
+          </div>
+        )}
+        <div class="badge-slot" aria-hidden="true"></div>
+        <div class="badge-shade" aria-hidden="true"></div>
+      </div>
+
+      <div class="badge-face badge-back">
+        {hasBack ? (
+          <slot name="back" />
+        ) : (
+          <div class="back-design" style={`background:${cardColor}`}>
+            <svg class="ornament" viewBox="-100 -100 200 200" fill="none" stroke="currentColor" stroke-width="1.4"
+              style={`width:${150*s}px;right:${-30*s}px;top:${30*s}px;color:${inkColor};opacity:.6`} aria-hidden="true">
+              <circle r="96" /><circle r="86" /><circle r="60" /><circle r="25" />
+              {angles.map((a) => <ellipse cx="0" cy="-73" rx="6.5" ry="12" transform={`rotate(${a})`} />)}
+              {angles.map((a) => <circle cx="0" cy="-91" r="1.8" fill="currentColor" transform={`rotate(${a + 11.25})`} />)}
+              {angles.slice(0, 8).map((_, i) => <path d="M0 -25 C 12 -38, 10 -50, 0 -58 C -10 -50, -12 -38, 0 -25" transform={`rotate(${i * 45})`} />)}
+              <circle r="6" fill="currentColor" />
+            </svg>
+            <div class="back-copy" style={`left:${22*s}px;top:${70*s}px;color:${strapColor}`}>
+              <svg viewBox="-100 -100 200 200" fill="none" stroke="currentColor" stroke-width="1.4"
+                style={`display:block;width:${26*s}px;color:${inkColor}`} aria-hidden="true">
+                <circle r="96" /><circle r="86" /><circle r="60" /><circle r="25" />
+                {angles.map((a) => <ellipse cx="0" cy="-73" rx="6.5" ry="12" transform={`rotate(${a})`} />)}
+                {angles.map((a) => <circle cx="0" cy="-91" r="1.8" fill="currentColor" transform={`rotate(${a + 11.25})`} />)}
+                {angles.slice(0, 8).map((_, i) => <path d="M0 -25 C 12 -38, 10 -50, 0 -58 C -10 -50, -12 -38, 0 -25" transform={`rotate(${i * 45})`} />)}
+                <circle r="6" fill="currentColor" />
+              </svg>
+              <div style={`width:${16*s}px;height:${2*s}px;background:${strapColor};margin:${14*s}px 0 ${8*s}px`}></div>
+              <div class="back-name" style={`font-size:${17*s}px`}>{name}</div>
+              <div class="back-role" style={`font-size:${7*s}px;margin-top:${3*s}px`}>{role}</div>
+            </div>
+             <div class="back-panel" style={`height:44%;background:${strapColor};border-top-left-radius:${40*s}px;color:${cardColor}`}>
+              <svg class="ornament" viewBox="-100 -100 200 200" fill="none" stroke="currentColor" stroke-width="1.4"
+                style={`width:${230*s}px;left:${-20*s}px;top:${-40*s}px;opacity:.85`} aria-hidden="true">
+                <circle r="96" /><circle r="86" /><circle r="60" /><circle r="25" />
+                {angles.map((a) => <ellipse cx="0" cy="-73" rx="6.5" ry="12" transform={`rotate(${a})`} />)}
+                {angles.map((a) => <circle cx="0" cy="-91" r="1.8" fill="currentColor" transform={`rotate(${a + 11.25})`} />)}
+                {angles.slice(0, 8).map((_, i) => <path d="M0 -25 C 12 -38, 10 -50, 0 -58 C -10 -50, -12 -38, 0 -25" transform={`rotate(${i * 45})`} />)}
+                <circle r="6" fill="currentColor" />
+              </svg>
+              <svg class="badge-arrow" viewBox="0 0 20 200" fill="none" stroke="currentColor" stroke-width="1.4"
+                style={`width:${12*s}px;height:${220*s}px;left:${150*s}px;top:${-40*s}px;transform:rotate(62deg)`} aria-hidden="true">
+                <path d="M10 4 L10 196 M3 18 L10 4 L17 18 M4 182 L10 170 L16 182 M4 194 L10 182 L16 194" />
+               </svg>
+               {profileHref && (
+                <a class="profile-link" href={profileHref}>
+                  {profileLabel}
+                  <span aria-hidden="true">↗</span>
+                </a>
+               )}
+              </div>
+          </div>
+        )}
+        <div class="badge-slot" aria-hidden="true"></div>
+        <div class="badge-shade" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+
+  {flipButton && (
+    <button type="button" class="flip-button" aria-pressed="false" aria-label="Girar credencial">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 12a9 9 0 0 1 15.5-6.2L21 8" />
+        <path d="M21 3v5h-5" />
+        <path d="M21 12a9 9 0 0 1-15.5 6.2L3 16" />
+        <path d="M3 21v-5h5" />
+      </svg>
+      <span data-flip-label>Mostrar reverso</span>
+    </button>
+  )}
+</section>
+
+
+<script src="./LanyardBadge.ts"></script>
