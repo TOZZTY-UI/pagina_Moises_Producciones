@@ -1,0 +1,406 @@
+/* ========================================
+   HERO PRINCIPAL
+======================================== */
+
+.hero {
+  --hero-spacing: clamp(1.25rem, 6vw, 6rem);
+
+  /* VARIABLES DE ANIMACIÓN */
+
+  --hero-progress: 0;
+  --hero-angle: -18deg;
+  --hero-slant: calc(100svh * 0.3249197);
+  --hero-glow-width: clamp(100px, 22vw, 320px);
+  --hero-glow-intensity: 0.90;
+
+  --hero-reveal: calc(
+    var(--hero-progress) *
+    (
+      100% +
+      var(--hero-slant) +
+      2 * var(--hero-glow-width)
+    ) - var(--hero-glow-width)
+  );
+
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  height: 100svh;
+  min-height: 100svh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+  box-sizing: border-box;
+
+  background: #171313;
+  color: #fff;
+}
+
+
+/* ========================================
+   MÁSCARA DE LA IMAGEN
+======================================== */
+
+.hero__image-mask {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+}
+
+
+/* ========================================
+   REVELADO DIAGONAL
+======================================== */
+
+.hero[data-hero-intro] .hero__image-mask {
+  clip-path: polygon(
+    0 0,
+    var(--hero-reveal) 0,
+    calc(var(--hero-reveal) - var(--hero-slant)) 100%,
+    0 100%
+  );
+
+  will-change: clip-path;
+}
+
+
+/* ========================================
+   IMAGEN DE FONDO
+======================================== */
+
+.hero__image {
+  position: absolute;
+  inset: 0;
+
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  max-width: none;
+  max-height: none;
+
+  object-fit: cover;
+  object-position: 50% 50%;
+
+  opacity: 0.82;
+
+  transform-origin: center;
+
+  will-change: transform;
+}
+
+
+/* ========================================
+   DEGRADADO
+======================================== */
+
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    180deg,
+    rgb(12 10 10 / 28%) 0%,
+    transparent 35%,
+    rgb(12 10 10 / 15%) 55%,
+    rgb(12 10 10 / 75%) 100%
+  );
+}
+
+
+/* ========================================
+   DESTELLO DIAGONAL SINCRONIZADO
+======================================== */
+
+.hero__sheen {
+  position: absolute;
+
+  z-index: 0;
+
+  top: 0;
+  bottom: 0;
+
+  left: calc(
+    var(--hero-reveal) -
+    var(--hero-slant) / 2
+  );
+
+  width: var(--hero-glow-width);
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 0%) 25%,
+    rgb(255 255 255 / var(--hero-glow-intensity)) 50%,
+    rgb(255 255 255 / 0%) 75%,
+    transparent 100%
+  );
+
+  transform:
+    translateX(-50%)
+    skewX(var(--hero-angle));
+
+  transform-origin: center;
+
+  mix-blend-mode: screen;
+
+  opacity: 0;
+  visibility: hidden;
+
+  will-change: left, opacity;
+}
+
+/* ========================================
+   FLASH DE LA CÁMARA
+======================================== */
+
+.hero__camera-exposure,
+.hero__camera-flash {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.hero__camera-exposure {
+  inset: 0;
+
+  background: radial-gradient(
+    ellipse at var(--hero-flash-x, 50%) var(--hero-flash-y, 20%),
+    #fff,
+    rgb(255 255 252 / 94%) 42%,
+    rgb(255 252 246 / 78%)
+  );
+}
+
+.hero__camera-flash {
+  top: 0;
+  left: 0;
+  z-index: 0;
+
+  width: clamp(10rem, var(--hero-flash-diameter, 16rem), 21rem);
+  aspect-ratio: 1;
+
+  translate: -50% -50%;
+  rotate: -4deg;
+
+  background:
+    radial-gradient(ellipse 18% 7%, #fff 40%, rgb(255 255 252 / 96%) 65%, transparent),
+    radial-gradient(ellipse 49% 5%, rgb(255 255 252 / 100%), rgb(255 249 232 / 72%) 36%, transparent),
+    radial-gradient(circle closest-side, #fff, rgb(255 253 247 / 96%) 18%, rgb(255 246 226 / 58%) 45%, rgb(255 243 220 / 22%) 72%, transparent);
+}
+
+
+/* ========================================
+   BLOQUEO DEL SCROLL
+======================================== */
+
+html.hero-scroll-locked,
+body.hero-scroll-locked {
+  overflow: hidden;
+}
+
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+======================================== */
+
+.hero__content {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex: 1;
+
+  flex-direction: column;
+  justify-content: flex-end;
+
+  min-height: 0;
+
+  padding: 0 var(--hero-spacing) 3rem;
+
+  box-sizing: border-box;
+}
+
+
+/* ========================================
+   TÍTULO PRINCIPAL
+======================================== */
+
+.hero__title-wrap {
+  position: relative;
+
+  align-self: flex-end;
+
+  text-align: right;
+
+  text-shadow: 0 2px 22px rgb(0 0 0 / 30%);
+}
+
+.hero__title-wrap h1 {
+  margin: 0;
+
+  font-size: clamp(4.8rem, 13vw, 12rem);
+
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  line-height: 0.78;
+}
+
+.hero__title-wrap p {
+  margin: 0.9rem 0 0;
+
+  color: rgb(255 255 255 / 90%);
+
+  font-size: clamp(1.1rem, 2vw, 1.8rem);
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+}
+
+
+/* ========================================
+   FOOTER DEL HERO
+======================================== */
+
+.hero__footer {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-shrink: 0;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1.5rem;
+
+  margin-inline: var(--hero-spacing);
+  margin-bottom: clamp(1.5rem, 4vh, 3rem);
+
+  padding-top: 1.25rem;
+
+  border-top: 1px solid rgb(255 255 255 / 40%);
+}
+
+
+/* ========================================
+   DESCRIPCIÓN
+======================================== */
+
+.hero__description {
+  margin: 0;
+
+  max-width: 25ch;
+
+  color: #fff;
+
+  font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+  line-height: 1.35;
+
+  text-wrap: pretty;
+}
+
+
+/* ========================================
+   BOTÓN
+======================================== */
+
+.hero__cta {
+  --color-bg: #171313;
+  --color-card: rgb(244 238 226 / 92%);
+  --color-text: #171313;
+  --color-accent: #c9a55a;
+
+  border-color: rgb(255 255 255 / 80%);
+}
+
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+/* Mantiene el cabezal de la cámara dentro del recorte vertical. */
+@media (max-aspect-ratio: 2/3) {
+  .hero__image {
+    object-position: 41% 50%;
+  }
+}
+
+@media (max-aspect-ratio: 2/5) {
+  .hero__image {
+    object-position: 37.5% 50%;
+  }
+}
+
+@media (min-aspect-ratio: 2/1) {
+  .hero__image {
+    object-position: 50% 25%;
+  }
+}
+
+@media (max-width: 700px) {
+  .hero__content {
+    padding-bottom: 2rem;
+  }
+
+  .hero__title-wrap {
+    align-self: flex-start;
+    text-align: left;
+  }
+
+  .hero__title-wrap h1 {
+    font-size: clamp(3rem, 15vw, 7rem);
+  }
+
+  .hero__title-wrap p {
+    font-size: 1rem;
+  }
+
+  .hero__footer {
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 1rem;
+
+    margin-bottom: 1.5rem;
+  }
+}
+
+
+/* ========================================
+   ACCESIBILIDAD
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero[data-hero-intro] .hero__image-mask {
+    clip-path: none;
+  }
+
+  .hero__image {
+    opacity: 0.82;
+
+    transform: none;
+    transition: none;
+  }
+
+  .hero__sheen,
+  .hero__camera-exposure,
+  .hero__camera-flash {
+    display: none;
+  }
+}

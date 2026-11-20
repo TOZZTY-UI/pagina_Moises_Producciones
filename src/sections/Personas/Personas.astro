@@ -2,6 +2,7 @@
 import LanyardBadge from "../../components/ux/LanyardBadge/LanyardBadge.astro";
 import personas from "../../data/personas.json";
 import "./Personas.css";
+import NoiseField from '../../components/ux/background/NoiseField.astro';
 
 const imageUrls = import.meta.glob("../../assets/**/*", {
   eager: true,
@@ -12,6 +13,14 @@ const imageUrls = import.meta.glob("../../assets/**/*", {
 const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
 ---
 <section id="personas" class="personas-carousel" aria-label="Personas de Moisés Producciones" aria-roledescription="carousel">
+  <NoiseField
+    color="#8f73ff"
+    background="#0b0b0f"
+    opacity={0.3}
+    scale={1}
+    speed={6}
+    className="personas-noise"
+  />
   <div class="personas-controls" role="group" aria-label="Controles de personas" hidden>
     <button type="button" class="personas-control" data-direction="previous" aria-label="Persona anterior" aria-controls="personas-track" disabled>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

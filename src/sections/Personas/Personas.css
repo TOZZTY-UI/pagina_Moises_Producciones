@@ -1,6 +1,19 @@
 
   .personas-carousel {
     position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .personas-carousel > .personas-noise {
+    z-index: 0;
+  }
+
+  .personas-controls,
+  .personas-grid,
+  .personas-status {
+    position: relative;
+    z-index: 1;
   }
 
   .personas-grid {

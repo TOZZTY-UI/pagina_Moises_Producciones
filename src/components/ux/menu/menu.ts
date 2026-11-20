@@ -1,11 +1,19 @@
 
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
   class ResizableNavbar extends HTMLElement {
     private controller?: AbortController;
     private scrollFrame = 0;
+    private sectionTriggers: ScrollTrigger[] = [];
 
-    connectedCallback() {
-      this.controller?.abort();
-      this.controller = new AbortController();
+  connectedCallback() {
+    this.controller?.abort();
+    this.sectionTriggers.forEach((trigger) => trigger.kill());
+    this.sectionTriggers = [];
+    this.controller = new AbortController();
 
       const { signal } = this.controller;
 
@@ -21,8 +29,50 @@
       const indicator =
         this.querySelector<HTMLElement>(".nav-indicator");
 
-      const links =
-        this.querySelectorAll<HTMLAnchorElement>(".nav-link");
+      const progress =
+        this.querySelector<HTMLElement>("[data-scroll-progress]");
+      const progressFill =
+        progress?.querySelector<HTMLElement>(".scroll-progress__fill");
+      const progressMarker =
+        progress?.querySelector<HTMLElement>(".scroll-progress__marker");
+      const progressValue =
+        progress?.querySelector<HTMLElement>(".scroll-progress__value");
+
+      const links = this.querySelectorAll<HTMLAnchorElement>(".nav-link");
+      const allSectionLinks = this.querySelectorAll<HTMLAnchorElement>(
+        "[data-section]"
+      );
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      );
+      const progressEase = "power3.out";
+      const progressDuration = reduceMotion.matches ? 0 : 0.55;
+
+      const updateProgress = (value: number) => {
+        if (!progress || !progressFill) return;
+
+        const progressY = value * progress.clientHeight;
+
+        gsap.to(progressFill, {
+          scaleY: value,
+          duration: progressDuration,
+          ease: progressEase,
+          overwrite: "auto",
+        });
+
+        gsap.to([progressMarker, progressValue].filter(Boolean), {
+          y: progressY,
+          duration: progressDuration,
+          ease: progressEase,
+          overwrite: "auto",
+        });
+
+        if (progressValue) {
+          progressValue.textContent = String(
+            Math.max(1, Math.round(value * 100))
+          );
+        }
+      };
 
       // Contraer el navbar al hacer scroll
       const updateScroll = () => {
@@ -39,6 +89,90 @@
       });
 
       updateScroll();
+
+      // Marca en el menú la sección que cruza el centro de la pantalla.
+      const moveIndicator = (link: HTMLElement, show = true) => {
+        if (!indicator) return;
+
+        gsap.to(indicator, {
+          width: link.offsetWidth,
+          x: link.offsetLeft,
+          autoAlpha: show ? 1 : 0,
+          duration: reduceMotion.matches ? 0 : 0.7,
+          ease: "power4.out",
+          overwrite: "auto",
+        });
+      };
+
+      let activeSection = "";
+
+      const setActiveSection = (sectionId: string) => {
+        if (activeSection === sectionId) return;
+        activeSection = sectionId;
+
+        allSectionLinks.forEach((link) => {
+          const isActive = link.dataset.section === sectionId;
+          link.classList.toggle("is-active", isActive);
+
+          if (isActive) {
+            link.setAttribute("aria-current", "page");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+
+        const desktopLink = this.querySelector<HTMLAnchorElement>(
+          `.nav-link[data-section="${sectionId}"]`
+        );
+
+        if (desktopLink) moveIndicator(desktopLink);
+      };
+
+      const sectionLinks = Array.from(links).filter(
+        (link) => link.dataset.section
+      );
+
+      const setInitialSection = () => {
+        const marker = window.scrollY + window.innerHeight * 0.55;
+        const visibleSections = sectionLinks
+          .map((link) => {
+            const sectionId = link.dataset.section;
+            const section = sectionId
+              ? document.getElementById(sectionId)
+              : null;
+
+            return section && sectionId && section.offsetTop <= marker
+              ? { sectionId, top: section.offsetTop }
+              : null;
+          })
+          .filter(
+            (entry): entry is { sectionId: string; top: number } =>
+              entry !== null
+          )
+          .sort((a, b) => b.top - a.top)[0];
+
+        if (visibleSections) {
+          setActiveSection(visibleSections.sectionId);
+        }
+      };
+
+      // Se actualiza en ambas direcciones para que Inicio también se active
+      // correctamente al volver hacia arriba desde Personas.
+      this.sectionTriggers.push(
+        ScrollTrigger.create({
+          start: 0,
+          end: "max",
+          onUpdate: (self) => {
+            setInitialSection();
+
+            updateProgress(self.progress);
+          },
+        })
+      );
+
+      setInitialSection();
+      updateProgress(0);
+      ScrollTrigger.refresh();
 
       // Abrir y cerrar menú móvil
       const setOpen = (open: boolean) => {
@@ -105,18 +239,6 @@
         { signal }
       );
 
-      // Indicador animado al pasar sobre un enlace
-      const moveIndicator = (link: HTMLElement) => {
-        if (!indicator) return;
-
-        indicator.style.width = `${link.offsetWidth}px`;
-
-        indicator.style.transform =
-          `translateX(${link.offsetLeft}px)`;
-
-        indicator.style.opacity = "1";
-      };
-
       links.forEach((link) => {
         link.addEventListener(
           "pointerenter",
@@ -132,9 +254,22 @@
       });
 
       const hideIndicator = () => {
-        if (indicator) {
-          indicator.style.opacity = "0";
+        if (activeSection) {
+          const activeLink = this.querySelector<HTMLAnchorElement>(
+            `.nav-link[data-section="${activeSection}"]`
+          );
+
+          if (activeLink) {
+            moveIndicator(activeLink);
+            return;
+          }
         }
+
+        gsap.to(indicator, {
+          autoAlpha: 0,
+          duration: reduceMotion.matches ? 0 : 0.18,
+          overwrite: "auto",
+        });
       };
 
       navLinks?.addEventListener(
@@ -166,12 +301,28 @@
         },
         { signal }
       );
+
+      reduceMotion.addEventListener(
+        "change",
+        () => {
+          if (activeSection) {
+            const activeLink = this.querySelector<HTMLAnchorElement>(
+              `.nav-link[data-section="${activeSection}"]`
+            );
+
+            if (activeLink) moveIndicator(activeLink);
+          }
+        },
+        { signal }
+      );
     }
 
     disconnectedCallback() {
       // Evita dejar una actualización pendiente al desmontar el menú.
       cancelAnimationFrame(this.scrollFrame);
       this.scrollFrame = 0;
+      this.sectionTriggers.forEach((trigger) => trigger.kill());
+      this.sectionTriggers = [];
       this.controller?.abort();
     }
   }

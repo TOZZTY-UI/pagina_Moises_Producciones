@@ -5,6 +5,7 @@ import { navigation } from '../../../lib/navigation';
 interface NavItem {
   name: string;
   href: string;
+  sectionId?: string;
 }
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
 const {
   brand = "SaxEventos",
   logo = "/icons/logo.webp",
-  items = navigation.map(({ label, href }) => ({ name: label, href })),
+  items = navigation.map(({ label, href, sectionId }) => ({ name: label, href, sectionId })),
 } = Astro.props;
 ---
 
@@ -36,7 +37,7 @@ const {
 
         {
           items.map((item) => (
-            <a href={item.href} class="nav-link">
+            <a href={item.href} class="nav-link" data-section={item.sectionId}>
               {item.name}
             </a>
           ))
@@ -75,7 +76,7 @@ const {
         <nav class="mobile-content" aria-label="Navegación móvil">
           {
             items.map((item) => (
-              <a href={item.href} class="mobile-link">
+              <a href={item.href} class="mobile-link" data-section={item.sectionId}>
                 {item.name}
               </a>
             ))
@@ -93,6 +94,12 @@ const {
 
     </div>
   </header>
+  <div class="scroll-progress" data-scroll-progress aria-hidden="true">
+    <span class="scroll-progress__track"></span>
+    <span class="scroll-progress__fill"></span>
+    <span class="scroll-progress__marker"></span>
+    <span class="scroll-progress__value">1</span>
+  </div>
 </resizable-navbar>
 
 <style>

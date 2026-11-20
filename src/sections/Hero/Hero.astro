@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+import BackGround from '../../assets/hero.png';
+import InteractiveHoverButton from '../../components/ux/InteractiveHoverButton/InteractiveHoverButton.astro';
+
+import '../../components/ux/InteractiveHoverButton/interactive-hover-button.css';
+import './Hero.css';
+---
+
+<section
+  id="inicio"
+  class="hero"
+  data-hero-intro
+  aria-labelledby="hero-title"
+>
+  <!-- IMAGEN Y MÁSCARA DE REVELADO -->
+  <div class="hero__image-mask">
+    <Image
+      class="hero__image"
+      src={BackGround}
+      alt=""
+      widths={[640, 960, 1280, 1680]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <span class="hero__camera-exposure" aria-hidden="true"></span>
+  </div>
+
+  <!-- DEGRADADO -->
+  <div
+    class="hero__scrim"
+    aria-hidden="true"
+  ></div>
+  <span class="hero__camera-flash" aria-hidden="true"></span>
+
+  <!-- DESTELLO DIAGONAL -->
+  <div
+    class="hero__sheen"
+    aria-hidden="true"
+  ></div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="hero__content">
+    <div class="hero__title-wrap">
+      <h1 id="hero-title">SaxEventos</h1>
+      <p>Producciones</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="hero__footer">
+    <p class="hero__description">
+      Música en vivo y fotografía para eventos
+    </p>
+
+    <InteractiveHoverButton
+      href="#personas"
+      text="Conoce al equipo"
+      className="hero__cta"
+      aria-label="Conoce al equipo de Moisés Producciones"
+    />
+  </div>
+</section>
+
+<script src="./Hero.ts"></script>
+
+<noscript>
+  <style>
+    .hero[data-hero-intro] .hero__image-mask {
+      clip-path: none;
+    }
+  </style>
+</noscript>

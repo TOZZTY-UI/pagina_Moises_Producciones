@@ -1,20 +1,16 @@
 ---
-import Preloader from '../../components/ux/Preloader/Preloader.astro';
-import Footer from '../../components/layout/Footer/Footer.astro';
-import Menu from '../../components/ux/menu/menu.astro';
-
-
+import Preloader from "../../components/ux/Preloader/Preloader.astro";
+import Footer from "../../components/layout/Footer/Footer.astro";
+import Menu from "../../components/ux/menu/menu.astro";
 
 interface Props {
   title?: string;
   showPreloader?: boolean;
 }
 
-const {
-  title = 'Moisés Producciones',
-  showPreloader = true,
-} = Astro.props;
+const { title = "Moisés Producciones", showPreloader = true } = Astro.props;
 ---
+
 <html lang="es">
   <head>
     <meta charset="utf-8" />
@@ -22,15 +18,17 @@ const {
     <title>{title}</title>
   </head>
   <body>
-  {showPreloader && <Preloader />}
+    <!-- {showPreloader && <Preloader />} -->
+
     <Menu />
     <slot />
     <div id="page-curtain" aria-hidden="true"></div>
     <Footer />
-
   </body>
 </html>
 
 <script src="./LandingPage.ts"></script>
 
-<style> @import './LandingPage.css'; </style>
+<style>
+  @import "./LandingPage.css";
+</style>
