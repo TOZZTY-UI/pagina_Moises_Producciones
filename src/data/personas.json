@@ -6,8 +6,8 @@
     "title": "Saxofonista",
     "subtitle": "",
     "description": "",
-    "LanyardBadgefront": "../../assets/MoisesLarenas/Perfil.jpeg",
-    "LanyardBadgehover": "../../assets/MoisesLarenas/Hover.png",
+    "LanyardBadgefront": "../../assets/MoisesLarenas/Perfil.webp",
+    "LanyardBadgehover": "../../assets/MoisesLarenas/Hover.webp",
     "frontImageAlt": "Moisés Larenas"
   },
   {
@@ -17,8 +17,8 @@
     "title": "Fotógrafo",
     "subtitle": "",
     "description": "",
-    "LanyardBadgefront": "../../assets/FelipeMontupil/PERFIL.png",
-    "LanyardBadgehover": "../../assets/FelipeMontupil/Hover.png",
+    "LanyardBadgefront": "../../assets/FelipeMontupil/PERFIL.webp",
+    "LanyardBadgehover": "../../assets/FelipeMontupil/Hover.webp",
     "frontImageAlt": "Felipe Montupil"
   },
   {
@@ -28,8 +28,19 @@
     "title": "Violinista",
     "subtitle": "",
     "description": "",
-    "LanyardBadgefront": "../../assets/DGviolinista/Perfil.jpg",
-    "LanyardBadgehover": "../../assets/DGviolinista/Hover.JPG",
+    "LanyardBadgefront": "../../assets/DGviolinista/Perfil.webp",
+    "LanyardBadgehover": "../../assets/DGviolinista/Hover.webp",
     "frontImageAlt": "Diego García"
+  },
+  {
+    "slug": "manudelrey",
+    "name": "Manuel Del Rey",
+    "role": "Guitarra",
+    "title": "Guitarrista",
+    "subtitle": "",
+    "description": "",
+    "LanyardBadgefront": "../../assets/Manudelrey/Perfil.webp",
+    "LanyardBadgehover": "../../assets/Manudelrey/Hover.webp",
+    "frontImageAlt": "Manuel Del Rey"
   }
 ]

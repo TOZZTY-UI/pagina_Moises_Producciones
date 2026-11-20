@@ -1,0 +1,104 @@
+
+---
+import { sidebarLinks } from '../../../data/navigation';
+
+interface NavItem {
+  name: string;
+  href: string;
+}
+
+interface Props {
+  items?: NavItem[];
+  brand?: string;
+  logo?: string;
+}
+
+const {
+  brand = "SaxEventos",
+  logo = "/icons/logo.webp",
+  items = sidebarLinks
+    .filter((item) => item.sectionId)
+    .map(({ label, sectionId }) => ({ name: label, href: `/#${sectionId}` })),
+} = Astro.props;
+---
+
+<resizable-navbar>
+  <header class="navbar">
+    <div class="nav-container">
+
+      <!-- Logo -->
+      <a href="/" class="brand">
+        <img src={logo} alt="" width="32" height="32" />
+        <span>{brand}</span>
+      </a>
+
+      <!-- Navegación escritorio -->
+      <nav class="nav-links" aria-label="Navegación principal">
+        <span class="nav-indicator" aria-hidden="true"></span>
+
+        {
+          items.map((item) => (
+            <a href={item.href} class="nav-link">
+              {item.name}
+            </a>
+          ))
+        }
+      </nav>
+
+      <!-- Botones escritorio -->
+      <div class="nav-actions">
+        <a href="/contacto" class="button secondary">
+          Contactar
+        </a>
+
+        <a href="/cotizar" class="button primary">
+          Cotizar
+        </a>
+      </div>
+
+      <!-- Botón móvil -->
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="mobile-navigation"
+      >
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Navegación móvil -->
+      <div
+        class="mobile-menu"
+        id="mobile-navigation"
+        inert
+      >
+        <nav class="mobile-content" aria-label="Navegación móvil">
+          {
+            items.map((item) => (
+              <a href={item.href} class="mobile-link">
+                {item.name}
+              </a>
+            ))
+          }
+
+          <a href="/contacto" class="button secondary">
+            Contactar
+          </a>
+
+          <a href="/cotizar" class="button primary">
+            Cotizar
+          </a>
+        </nav>
+      </div>
+
+    </div>
+  </header>
+</resizable-navbar>
+
+<style>
+@import './menu.css';
+</style>
+
+<script src="./menu.ts"></script>

@@ -10,30 +10,52 @@ const imageUrls = import.meta.glob("../../assets/**/*", {
 
 const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
 ---
-<div class="personas-grid">
-  {personas.map((person) => {
+<section id="personas" class="personas-carousel" aria-label="Personas de Moisés Producciones" aria-roledescription="carousel">
+  <div class="personas-controls" aria-label="Controles de personas">
+    <button type="button" class="personas-control" data-direction="previous" aria-label="Persona anterior">‹</button>
+    <button type="button" class="personas-control" data-direction="next" aria-label="Persona siguiente">›</button>
+  </div>
+  <div
+    class="personas-grid"
+    data-personas-track
+    tabindex="0"
+    role="group"
+    aria-label="Credenciales"
+    style={`--personas-count:${personas.length}`}
+  >
+  {personas.map((person, index) => {
     return (
-      <LanyardBadge
-        title={person.title}
-        subtitle={person.subtitle}
-        name={person.name}
-        role={person.role}
-        frontImage={resolveImage(person.LanyardBadgefront)}
-        frontImageHover={resolveImage(person.LanyardBadgehover)}
-        frontImageAlt={person.frontImageAlt}
-        profileHref={`/personas/${person.slug}`}
-        strapText="hola"
-        strapLabel="PRODUCCIONES"
-        strapColor="#141312"
-        inkColor="#b59a6c"
-        cardColor="#e8dfcc"
-        cardWidth={240}
-        height="100svh"
-        flipButton={false}
-      />
+      <div
+        class:list={['personas-slide', index === 0 && 'is-active']}
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`${index + 1} de ${personas.length}: ${person.name}`}
+      >
+        <LanyardBadge
+          title={person.title}
+          subtitle={person.subtitle}
+          name={person.name}
+          role={person.role}
+          frontImage={resolveImage(person.LanyardBadgefront)}
+          frontImageHover={resolveImage(person.LanyardBadgehover)}
+          frontImageAlt={person.frontImageAlt}
+          profileHref={`/${person.slug}`}
+          strapText="hola"
+          strapLabel="PRODUCCIONES"
+          strapColor="#141312"
+          inkColor="#b59a6c"
+          cardColor="#e8dfcc"
+          cardWidth={240}
+          height="100svh"
+          flipButton={false}
+        />
+      </div>
     );
   })}
-</div>
+  </div>
+  <p class="personas-status" role="status" aria-live="polite"></p>
+</section>
+<script type="module" src="./Persona.ts"></script>
 <style>
-@import "./Personas.css";
+  @import "./Personas.css";
 </style>

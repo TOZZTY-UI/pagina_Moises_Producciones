@@ -53,6 +53,7 @@ function swingAngle(top: Pt, bottom: Pt) {
 // #endregion
 const DISPLAY = '"Oswald", "Bebas Neue", "Arial Narrow", Impact, sans-serif'
 const SCRIPT = '"Segoe Script", "Brush Script MT", "Snell Roundhand", cursive'
+const AUTO_HOVER_INTERVAL = 2000
 
 /** A mandala: rings, petals, a bead circle and a flower in the middle. */
 function drawMandala(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
@@ -167,6 +168,7 @@ function makeStrap(
     const canvas = root.querySelector<HTMLCanvasElement>('.lanyard-canvas');
     const card = root.querySelector<HTMLDivElement>('.lanyard-card');
     const inner = root.querySelector<HTMLDivElement>('.lanyard-inner');
+    const hoverImage = root.querySelector<HTMLImageElement>('.badge-image--hover');
     const flipButton = root.querySelector<HTMLButtonElement>('.flip-button');
     const flipLabel = root.querySelector<HTMLElement>('[data-flip-label]');
     const ctx = canvas?.getContext('2d');
@@ -201,11 +203,28 @@ function makeStrap(
     let dpr = 1
     let W = 1
     let H = 1
+    // Extra drawing room prevents the swinging cord from being clipped by
+    // the canvas bitmap when the card is dragged toward a section edge.
+    // Each badge can be dragged across its whole Personas section. Keep
+    // enough bitmap room on both sides for the complete cord and its swing.
+    const baseBleed = Math.max(120, cw * 0.75)
+    let bleed = baseBleed
+
+    const resizeCanvas = () => {
+      canvas.width = Math.round((W + bleed * 2) * dpr)
+      canvas.height = Math.round((H + bleed * 2) * dpr)
+      canvas.style.left = `${-bleed}px`
+      canvas.style.top = `${-bleed}px`
+      canvas.style.width = `calc(100% + ${bleed * 2}px)`
+      canvas.style.height = `calc(100% + ${bleed * 2}px)`
+    }
     let strapTex: HTMLCanvasElement | null = null
     let plainTex: HTMLCanvasElement | null = null
     const spin: Spin = { a: 0, v: 0 }
     let spinTarget = 0
     spin.a = spinTarget
+    let autoHoverTimer: number | undefined
+    let autoHoverPaused = false
 
     const add = (x: number, y: number, w: number) => {
       pts.push({ x, y, px: x, py: y, w })
@@ -223,11 +242,12 @@ function makeStrap(
     }
 
     const build = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      // 1.5x keeps the cord crisp without multiplying every canvas operation
+      // unnecessarily on high-density displays.
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5)
       W = Math.max(1, root.clientWidth)
       H = Math.max(1, root.clientHeight)
-      canvas.width = Math.round(W * dpr)
-      canvas.height = Math.round(H * dpr)
+      resizeCanvas()
 
       pts = []
       links = []
@@ -269,9 +289,9 @@ function makeStrap(
       }
     }
 
-    const STEP = 1 / 120
+    const STEP = 1 / 90
     const GRAVITY = 2400
-    const ITER = 18
+    const ITER = 12
 
     // ---- drawing ---------------------------------------------------------
     const ribbon = (ids: number[], tex: HTMLCanvasElement, rest: number, light: number) => {
@@ -290,7 +310,7 @@ function makeStrap(
         const v0 = i * rest * dpr
         const dv = rest * dpr
         const k = len / dv
-        ctx.setTransform(nx, ny, tx * k, ty * k, a.x * dpr - (nx * Wt) / 2 - tx * k * v0, a.y * dpr - (ny * Wt) / 2 - ty * k * v0)
+        ctx.setTransform(nx, ny, tx * k, ty * k, bleed * dpr + a.x * dpr - (nx * Wt) / 2 - tx * k * v0, bleed * dpr + a.y * dpr - (ny * Wt) / 2 - ty * k * v0)
         // +1.5 overlaps the next slice, so bends never show a hairline seam
         const src = Math.min(dv + 1.5, tex.height - v0)
         if (src > 0) ctx.drawImage(tex, 0, v0, Wt, src, 0, v0, Wt, src)
@@ -324,7 +344,7 @@ function makeStrap(
       const T = pts[iT]
       const ang = Math.atan2(T.x - B.x, T.y - B.y)
       const u = sw / 20
-      ctx.setTransform(dpr, 0, 0, dpr, B.x * dpr, B.y * dpr)
+      ctx.setTransform(dpr, 0, 0, dpr, (bleed + B.x) * dpr, (bleed + B.y) * dpr)
       ctx.rotate(-ang)
       ctx.shadowColor = "rgba(0,0,0,0.3)"
       ctx.shadowBlur = 6 * dpr
@@ -348,7 +368,7 @@ function makeStrap(
       ctx.stroke()
 
       // split ring
-      ctx.setTransform(dpr, 0, 0, dpr, T.x * dpr, (T.y + ringR * 0.8) * dpr)
+      ctx.setTransform(dpr, 0, 0, dpr, (bleed + T.x) * dpr, (bleed + T.y + ringR * 0.8) * dpr)
       ctx.lineWidth = Math.max(2.5, ringR * 0.38)
       ctx.strokeStyle = metal(-ringR, -ringR, ringR, ringR)
       ctx.beginPath()
@@ -369,8 +389,9 @@ function makeStrap(
     }
 
     // ---- interaction -----------------------------------------------------
-    type Drag = { id: number; ox: number; oy: number; tx: number; ty: number; sx: number; sy: number; moved: boolean }
+    type Drag = { id: number; ox: number; oy: number; tx: number; ty: number; sx: number; sy: number; moved: boolean; active: boolean }
     let drag: Drag | null = null
+    let mobileTap: { id: number; x: number; y: number } | null = null
     const local = (e: PointerEvent) => {
       const r = root.getBoundingClientRect()
       return [e.clientX - r.left, e.clientY - r.top]
@@ -385,25 +406,70 @@ function makeStrap(
     const onDown = (e: PointerEvent) => {
       if (e.button > 0) return
       if ((e.target as Element).closest("a, button")) return
+      if (mobileQuery.matches) {
+        mobileTap = { id: e.pointerId, x: e.clientX, y: e.clientY }
+        return
+      }
       const [x, y] = local(e)
       const T = pts[iT]
-      drag = { id: e.pointerId, ox: T.x - x, oy: T.y - y, tx: T.x, ty: T.y, sx: x, sy: y, moved: false }
-      pts[iT].w = 0
-      card.setPointerCapture(e.pointerId)
-      card.style.cursor = "grabbing"
+      const active = e.pointerType !== 'touch'
+      drag = { id: e.pointerId, ox: T.x - x, oy: T.y - y, tx: T.x, ty: T.y, sx: x, sy: y, moved: false, active }
+      if (active) {
+        pts[iT].w = 0
+        const section = root.closest<HTMLElement>('.personas-carousel')
+        bleed = Math.max(baseBleed, section?.clientWidth || root.clientWidth)
+        resizeCanvas()
+        root.classList.add('is-dragging')
+        card.setPointerCapture(e.pointerId)
+        card.style.cursor = "grabbing"
+      }
     }
     const onMove = (e: PointerEvent) => {
+      if (mobileTap?.id === e.pointerId) {
+        if (Math.hypot(e.clientX - mobileTap.x, e.clientY - mobileTap.y) > 8) mobileTap = null
+        return
+      }
       if (!drag || e.pointerId !== drag.id) return
       const [x, y] = local(e)
+      if (!drag.active && e.pointerType === 'touch') {
+        const dx = x - drag.sx
+        const dy = y - drag.sy
+        if (Math.hypot(dx, dy) < 8) return
+        if (Math.abs(dy) > Math.abs(dx)) {
+          drag = null
+          return
+        }
+        drag.active = true
+        pts[iT].w = 0
+        const section = root.closest<HTMLElement>('.personas-carousel')
+        bleed = Math.max(baseBleed, section?.clientWidth || root.clientWidth)
+        resizeCanvas()
+        root.classList.add('is-dragging')
+        card.setPointerCapture(e.pointerId)
+        card.style.cursor = "grabbing"
+      }
+      if (!drag.active) return
       drag.tx = x + drag.ox
       drag.ty = y + drag.oy
       if (Math.hypot(x - drag.sx, y - drag.sy) > 5) drag.moved = true
     }
     const onUp = (e: PointerEvent) => {
+      if (e.type === 'pointercancel') {
+        mobileTap = null
+      } else if (mobileTap?.id === e.pointerId) {
+        mobileTap = null
+        flip()
+        return
+      }
       if (!drag || e.pointerId !== drag.id) return
       if (!drag.moved) flip()
+      if (!drag.active) {
+        drag = null
+        return
+      }
       drag = null
       pts[iT].w = 0.8
+      root.classList.remove('is-dragging')
       card.style.cursor = "grab"
     }
     const onKeyDown = (e: KeyboardEvent) => {
@@ -413,14 +479,51 @@ function makeStrap(
       }
     }
     const onFlipClick = () => flip()
+    const onActivate = (event: Event) => {
+      if (reduced) return
+      const direction = Number((event as CustomEvent<{ direction?: number }>).detail?.direction) || 1
+      const C = pts[iC]
+      C.x += direction * cw * 0.62
+      C.px = C.x - direction * 4
+      spin.v = direction * 5.5
+    }
+    const setAutoHover = (active: boolean) => {
+      if (!hoverImage || reduced || autoHoverPaused || !mobileQuery.matches) return
+      card.classList.toggle('is-auto-hover', active)
+    }
+    const pauseAutoHover = () => {
+      if (!hoverImage) return
+      autoHoverPaused = true
+      card.classList.remove('is-auto-hover')
+      if (autoHoverTimer !== undefined) window.clearInterval(autoHoverTimer)
+    }
+    const resumeAutoHover = () => {
+      if (!hoverImage || reduced || !mobileQuery.matches) return
+      autoHoverPaused = false
+      if (autoHoverTimer !== undefined) window.clearInterval(autoHoverTimer)
+      autoHoverTimer = window.setInterval(() => {
+        setAutoHover(!card.classList.contains('is-auto-hover'))
+        }, AUTO_HOVER_INTERVAL)
+    }
     const onMotionChange = (e: MediaQueryListEvent) => {
       reduced = e.matches
+      if (reduced) {
+        pauseAutoHover()
+      } else {
+        if (mobileQuery.matches) resumeAutoHover()
+        else pauseAutoHover()
+      }
       build()
       draw()
       place()
     }
     card.addEventListener("keydown", onKeyDown)
     flipButton?.addEventListener("click", onFlipClick)
+    card.addEventListener("mouseenter", pauseAutoHover)
+    card.addEventListener("mouseleave", resumeAutoHover)
+    card.addEventListener("focusin", pauseAutoHover)
+    card.addEventListener("focusout", resumeAutoHover)
+    root.addEventListener("lanyard:activate", onActivate)
     motionQuery.addEventListener("change", onMotionChange)
     card.addEventListener("pointerdown", onDown)
     card.addEventListener("pointermove", onMove)
@@ -432,6 +535,10 @@ function makeStrap(
     let acc = 0
     let last = performance.now()
     let t = 0
+    let isVisible = true
+    let pageVisible = !document.hidden
+    const mobileQuery = window.matchMedia('(max-width: 800px)')
+    let isActive = !mobileQuery.matches || root.closest('.personas-slide')?.classList.contains('is-active') === true
     const tick = (now: number) => {
       acc += Math.min(0.05, (now - last) / 1000)
       last = now
@@ -459,15 +566,80 @@ function makeStrap(
       }
       draw()
       place()
-      raf = requestAnimationFrame(tick)
+      if (isVisible && pageVisible && isActive) {
+        raf = requestAnimationFrame(tick)
+      } else {
+        raf = 0
+      }
     }
+
+    const syncLoop = () => {
+      if (!isVisible || !pageVisible || !isActive) {
+        cancelAnimationFrame(raf)
+        raf = 0
+        return
+      }
+      if (!raf) {
+        last = performance.now()
+        raf = requestAnimationFrame(tick)
+      }
+    }
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting
+      syncLoop()
+    }, { rootMargin: '160px' })
+    const onVisibilityChange = () => {
+      pageVisible = !document.hidden
+      syncLoop()
+    }
+    const onSlideVisibility = (event: Event) => {
+      isActive = !mobileQuery.matches || Boolean((event as CustomEvent<{ active?: boolean }>).detail?.active)
+        if (isActive) {
+          build()
+          draw()
+          place()
+          if (mobileQuery.matches) resumeAutoHover()
+          else pauseAutoHover()
+      } else {
+        pauseAutoHover()
+      }
+      syncLoop()
+    }
+    const onBreakpointChange = () => {
+      isActive = !mobileQuery.matches || root.closest('.personas-slide')?.classList.contains('is-active') === true
+      if (isActive) {
+        build()
+        draw()
+        place()
+        if (mobileQuery.matches) resumeAutoHover()
+        else pauseAutoHover()
+      } else {
+        pauseAutoHover()
+      }
+      syncLoop()
+    }
+    visibilityObserver.observe(root)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    root.addEventListener('lanyard:visibility', onSlideVisibility)
+    mobileQuery.addEventListener('change', onBreakpointChange)
+
     build()
     draw()
     place()
-    raf = requestAnimationFrame(tick)
+    if (isActive && mobileQuery.matches) {
+      resumeAutoHover()
+    } else {
+      pauseAutoHover()
+    }
+    syncLoop()
 
     const observer = new ResizeObserver(() => {
-      if (Math.abs(root.clientWidth - W) < 1 && Math.abs(root.clientHeight - H) < 1) return
+      const widthChanged = Math.abs(root.clientWidth - W) >= 1
+      const heightChanged = Math.abs(root.clientHeight - H) >= 1
+      // Chrome changes the visual height while its mobile toolbar expands or
+      // collapses. Do not rebuild the Verlet chain for that transient change.
+      if (!widthChanged && (!heightChanged || mobileQuery.matches)) return
       build()
       draw()
       place()
@@ -478,9 +650,20 @@ function makeStrap(
 
     return () => {
       cancelAnimationFrame(raf);
+      root.classList.remove('is-dragging')
+      visibilityObserver.disconnect()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      root.removeEventListener('lanyard:visibility', onSlideVisibility)
+      mobileQuery.removeEventListener('change', onBreakpointChange)
+      if (autoHoverTimer !== undefined) window.clearInterval(autoHoverTimer)
       observer.disconnect();
       motionQuery.removeEventListener('change', onMotionChange);
       flipButton?.removeEventListener('click', onFlipClick);
+      card.removeEventListener('mouseenter', pauseAutoHover);
+      card.removeEventListener('mouseleave', resumeAutoHover);
+      card.removeEventListener('focusin', pauseAutoHover);
+      card.removeEventListener('focusout', resumeAutoHover);
+      root.removeEventListener('lanyard:activate', onActivate);
       card.removeEventListener('keydown', onKeyDown);
       card.removeEventListener('pointerdown', onDown);
       card.removeEventListener('pointermove', onMove);

@@ -82,9 +82,9 @@ import './LanyardBadge.css';
           <slot name="front" />
         ) : frontImage ? (
           <>
-            <img class="badge-image" src={frontImage} alt={frontImageAlt} />
-            {frontImageHover && (
-              <img class="badge-image badge-image--hover" src={frontImageHover} alt="" aria-hidden="true" />
+             <img class="badge-image" src={frontImage} alt={frontImageAlt} loading="lazy" decoding="async" />
+             {frontImageHover && (
+               <img class="badge-image badge-image--hover" src={frontImageHover} alt="" aria-hidden="true" loading="lazy" decoding="async" />
             )}
           </>
         ) : (

@@ -6,6 +6,9 @@ export default defineConfig({
   site: 'https://producciones.saxeventos.cl',
   output: 'static',
   compressHTML: true,
+  redirects: {
+    '/personas/[slug]': '/[slug]',
+  },
 
   vite: {
     plugins: [tailwindcss()],
@@ -18,8 +21,8 @@ export default defineConfig({
 
   integrations: [
     sitemap({
-      // Las confirmaciones de pago y la página 404 no son contenido indexable.
-      filter: (page) => !page.includes('/pago/') && !page.endsWith('/404/'),
+      // la página 404 no son contenido indexable.
+      filter: (page) => !page.endsWith('/404/'),
     }),
   ],
 });

@@ -1,12 +1,112 @@
 
+  .personas-carousel {
+    position: relative;
+  }
+
   .personas-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    position: relative;
     width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .personas-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .personas-slide {
+    flex: 0 0 calc(100% / var(--personas-count, 1));
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .personas-controls {
+    display: none;
+  }
+
+  .personas-controls {
+    justify-content: space-between;
+    position: absolute;
+    top: 72%;
+    right: 24px;
+    left: 24px;
+    z-index: 5;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .personas-control {
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgb(255 255 255 / .45);
+    border-radius: 50%;
+    background: rgb(20 19 18 / .72);
+    color: #e8dfcc;
+    cursor: pointer;
+    font-size: 32px;
+    line-height: 1;
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+
+  .personas-control:disabled {
+    opacity: .3;
+    cursor: default;
+  }
+
+  .personas-control:focus-visible {
+    outline: 2px solid #e8dfcc;
+    outline-offset: 3px;
+  }
+
+  .personas-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 801px) {
+    .personas-grid {
+      overflow: visible;
+    }
   }
 
   @media (max-width: 800px) {
+    .lanyard-card {
+      touch-action: auto;
+    }
+
+    .personas-slide {
+      flex-basis: 100%;
+    }
+
+    .personas-slide:not(.is-active) {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .personas-controls {
+      top: 72%;
+      right: 1rem;
+      left: 1rem;
+      z-index: 999;
+      display: flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
     .personas-grid {
-      grid-template-columns: 1fr;
+      scroll-behavior: smooth;
     }
   }
