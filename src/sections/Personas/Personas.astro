@@ -1,6 +1,7 @@
 ---
 import LanyardBadge from "../../components/ux/LanyardBadge/LanyardBadge.astro";
 import personas from "../../data/personas.json";
+import "./Personas.css";
 
 const imageUrls = import.meta.glob("../../assets/**/*", {
   eager: true,
@@ -11,11 +12,20 @@ const imageUrls = import.meta.glob("../../assets/**/*", {
 const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
 ---
 <section id="personas" class="personas-carousel" aria-label="Personas de Moisés Producciones" aria-roledescription="carousel">
-  <div class="personas-controls" aria-label="Controles de personas">
-    <button type="button" class="personas-control" data-direction="previous" aria-label="Persona anterior">‹</button>
-    <button type="button" class="personas-control" data-direction="next" aria-label="Persona siguiente">›</button>
+  <div class="personas-controls" role="group" aria-label="Controles de personas" hidden>
+    <button type="button" class="personas-control" data-direction="previous" aria-label="Persona anterior" aria-controls="personas-track" disabled>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </button>
+    <button type="button" class="personas-control" data-direction="next" aria-label="Persona siguiente" aria-controls="personas-track">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 18 6-6-6-6" />
+      </svg>
+    </button>
   </div>
   <div
+    id="personas-track"
     class="personas-grid"
     data-personas-track
     tabindex="0"
@@ -55,7 +65,4 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
   </div>
   <p class="personas-status" role="status" aria-live="polite"></p>
 </section>
-<script type="module" src="./Persona.ts"></script>
-<style>
-  @import "./Personas.css";
-</style>
+<script src="./Persona.ts"></script>

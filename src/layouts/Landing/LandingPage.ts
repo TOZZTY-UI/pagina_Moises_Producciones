@@ -15,7 +15,7 @@
     if (!curtain || animating) return;
 
     event.preventDefault();
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       window.location.href = destination.href;
       return;
     }
@@ -32,15 +32,25 @@
       : 'polygon(-60% 0, 130% 0, 155% 100%, -60% 100%)';
 
     curtain.style.clipPath = initial;
-    const animation = curtain.animate(
-      [{ clipPath: initial }, { clipPath: covered }],
-      {
-        duration: 650,
-        easing: 'cubic-bezier(0.77, 0, 0.18, 1)',
-        fill: 'forwards',
-      },
-    );
-
-    await animation.finished;
-    window.location.href = destination.href;
+    const duration = 650;
+    let fallback: number | undefined;
+    try {
+      const animation = curtain.animate(
+        [{ clipPath: initial }, { clipPath: covered }],
+        {
+          duration,
+          easing: 'cubic-bezier(0.77, 0, 0.18, 1)',
+          fill: 'forwards',
+        },
+      );
+      await Promise.race([
+        animation.finished,
+        new Promise<void>((resolve) => { fallback = window.setTimeout(resolve, duration + 150); }),
+      ]);
+    } catch {
+      // A cancelled transition must not prevent navigation.
+    } finally {
+      window.clearTimeout(fallback);
+      window.location.href = destination.href;
+    }
   });

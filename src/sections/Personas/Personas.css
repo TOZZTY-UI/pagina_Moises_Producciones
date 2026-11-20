@@ -9,49 +9,35 @@
     display: flex;
     flex-flow: row nowrap;
     gap: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .personas-grid::-webkit-scrollbar {
-    display: none;
   }
 
   .personas-slide {
     flex: 0 0 calc(100% / var(--personas-count, 1));
     min-width: 0;
-    scroll-snap-align: start;
   }
 
   .personas-controls {
     display: none;
-  }
-
-  .personas-controls {
     justify-content: space-between;
     position: absolute;
     top: 72%;
-    right: 24px;
-    left: 24px;
-    z-index: 5;
+    inset-inline: 1rem;
+    z-index: 999;
     pointer-events: none;
     transform: translateY(-50%);
   }
 
   .personas-control {
-    width: 42px;
-    height: 42px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
     border: 1px solid rgb(255 255 255 / .45);
     border-radius: 50%;
     background: rgb(20 19 18 / .72);
     color: #e8dfcc;
     cursor: pointer;
-    font-size: 32px;
-    line-height: 1;
     pointer-events: auto;
     touch-action: manipulation;
   }
@@ -62,7 +48,7 @@
   }
 
   .personas-control:focus-visible {
-    outline: 2px solid #e8dfcc;
+    outline: 2px solid #141312;
     outline-offset: 3px;
   }
 
@@ -76,36 +62,51 @@
     white-space: nowrap;
   }
 
-  @media (min-width: 801px) {
-    .personas-grid {
-      overflow: visible;
-    }
-  }
-
   @media (max-width: 800px) {
-    .lanyard-card {
-      touch-action: auto;
+    .personas-grid {
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      touch-action: manipulation;
+    }
+
+    .personas-grid::-webkit-scrollbar {
+      display: none;
     }
 
     .personas-slide {
       flex-basis: 100%;
+      /* Keep the oversized lanyard canvas inside its slide, not the scroll track. */
+      overflow: clip;
+      scroll-snap-align: start;
     }
 
-    .personas-slide:not(.is-active) {
-      visibility: hidden;
+    .personas-grid .lanyard-root {
+      min-height: 35rem;
+    }
+
+    .personas-grid .lanyard-card {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .personas-grid .lanyard-inner {
       pointer-events: none;
     }
 
-    .personas-controls {
-      top: 72%;
-      right: 1rem;
-      left: 1rem;
-      z-index: 999;
+    .personas-grid .profile-link {
+      min-height: 44px;
+      font-size: .75rem;
+    }
+
+    .personas-controls:not([hidden]) {
       display: flex;
     }
   }
 
-  @media (prefers-reduced-motion: no-preference) {
+  @media (max-width: 800px) and (prefers-reduced-motion: no-preference) {
     .personas-grid {
       scroll-behavior: smooth;
     }

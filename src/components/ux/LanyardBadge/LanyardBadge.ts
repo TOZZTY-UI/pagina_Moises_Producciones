@@ -41,8 +41,8 @@ function solve(pts: Pt[], links: Link[], iterations: number) {
  * The card's turn on the ring. The strap's own twist is the spring pulling it
  * back to `target`; `drive` is whatever is twisting it right now.
  */
-function spinStep(s: Spin, target: number, dt: number, drive: number) {
-  s.v += (-(s.a - target) * 18 - s.v * 3.2 + drive) * dt
+function spinStep(s: Spin, target: number, dt: number, drive: number, stiffness = 18, damping = 3.2) {
+  s.v += (-(s.a - target) * stiffness - s.v * damping + drive) * dt
   s.a += s.v * dt
 }
 
@@ -168,11 +168,13 @@ function makeStrap(
     const canvas = root.querySelector<HTMLCanvasElement>('.lanyard-canvas');
     const card = root.querySelector<HTMLDivElement>('.lanyard-card');
     const inner = root.querySelector<HTMLDivElement>('.lanyard-inner');
+    const backFace = root.querySelector<HTMLElement>('.badge-back');
     const hoverImage = root.querySelector<HTMLImageElement>('.badge-image--hover');
     const flipButton = root.querySelector<HTMLButtonElement>('.flip-button');
     const flipLabel = root.querySelector<HTMLElement>('[data-flip-label]');
     const ctx = canvas?.getContext('2d');
     if (!canvas || !card || !inner || !ctx) return;
+    if (backFace) backFace.inert = true;
 
     const cw = Number(root.dataset.cardWidth || 240);
     const ch = Math.round(cw * 1.5);
@@ -185,6 +187,7 @@ function makeStrap(
       inkColor: root.dataset.inkColor || '#b59a6c'
     };
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mobileQuery = window.matchMedia('(max-width: 800px)');
     let reduced = motionQuery.matches;
     const sw = Math.max(14, Math.round(cw * 0.1)) // strap width
     const lowLen = sw * 2.2 // buckle to ring
@@ -221,6 +224,7 @@ function makeStrap(
     let strapTex: HTMLCanvasElement | null = null
     let plainTex: HTMLCanvasElement | null = null
     const spin: Spin = { a: 0, v: 0 }
+    const tug = { x: 0, v: 0, target: 0, updatedAt: -Infinity }
     let spinTarget = 0
     spin.a = spinTarget
     let autoHoverTimer: number | undefined
@@ -247,6 +251,8 @@ function makeStrap(
       dpr = Math.min(window.devicePixelRatio || 1, 1.5)
       W = Math.max(1, root.clientWidth)
       H = Math.max(1, root.clientHeight)
+      tug.x = tug.v = tug.target = 0
+      tug.updatedAt = -Infinity
       resizeCanvas()
 
       pts = []
@@ -276,22 +282,43 @@ function makeStrap(
       strapTex = makeStrap(strandRest * N + 4, sw, dpr, opts)
       plainTex = makeStrap(lowLen + 4, sw * 0.8, dpr, { ...opts, plain: true })
 
+      if (!reduced && !mobileQuery.matches) {
+        // On desktop, enter mid-swing, as if someone just let go of it.
+        pts[iC].x += cw * 0.55
+        pts[iC].px = pts[iC].x - 2
+        spin.v = 5
+      } else {
+        // Keep the card in reach when it comes into view in the phone carousel.
+        spin.a = spinTarget
+        spin.v = 0
+      }
       if (reduced) {
         for (let i = 0; i < 900; i++) {
           integrate(pts, STEP, GRAVITY, 0.98)
           solve(pts, links, ITER)
         }
-      } else {
-        // enter mid-swing, as if someone just let go of it
-        pts[iC].x += cw * 0.55
-        pts[iC].px = pts[iC].x - 2
-        spin.v = 5
       }
     }
 
     const STEP = 1 / 90
     const GRAVITY = 2400
     const ITER = 12
+
+    const movePins = (now: number) => {
+      const target = now - tug.updatedAt < 64 ? tug.target : 0
+      // Spring only the two pinned points. Gravity and the rope constraints
+      // transfer that motion to the buckle and lastly to the card.
+      tug.v += ((target - tug.x) * 400 - tug.v * 34) * STEP
+      tug.x += tug.v * STEP
+      const spread = Math.min(W * 0.16, cw * 0.55)
+      const center = W / 2 + tug.x
+      const height = -sw * 2 - Math.abs(tug.x) * 0.2
+      const aL = pts[left[0]]
+      const aR = pts[right[0]]
+      aL.x = center - spread
+      aR.x = center + spread
+      aL.y = aR.y = height
+    }
 
     // ---- drawing ---------------------------------------------------------
     const ribbon = (ids: number[], tex: HTMLCanvasElement, rest: number, light: number) => {
@@ -399,9 +426,15 @@ function makeStrap(
     const flip = () => {
       spinTarget = spinTarget === 0 ? Math.PI : 0
       const flipped = spinTarget !== 0
+      if (backFace) backFace.inert = !flipped
       card.setAttribute("aria-pressed", String(flipped))
       flipButton?.setAttribute("aria-pressed", String(flipped))
       if (flipLabel) flipLabel.textContent = flipped ? "Mostrar frente" : "Mostrar reverso"
+      if (reduced) {
+        spin.a = spinTarget
+        spin.v = 0
+        place()
+      }
     }
     const onDown = (e: PointerEvent) => {
       if (e.button > 0) return
@@ -473,20 +506,13 @@ function makeStrap(
       card.style.cursor = "grab"
     }
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.target !== card) return
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault()
         flip()
       }
     }
     const onFlipClick = () => flip()
-    const onActivate = (event: Event) => {
-      if (reduced) return
-      const direction = Number((event as CustomEvent<{ direction?: number }>).detail?.direction) || 1
-      const C = pts[iC]
-      C.x += direction * cw * 0.62
-      C.px = C.x - direction * 4
-      spin.v = direction * 5.5
-    }
     const setAutoHover = (active: boolean) => {
       if (!hoverImage || reduced || autoHoverPaused || !mobileQuery.matches) return
       card.classList.toggle('is-auto-hover', active)
@@ -498,7 +524,7 @@ function makeStrap(
       if (autoHoverTimer !== undefined) window.clearInterval(autoHoverTimer)
     }
     const resumeAutoHover = () => {
-      if (!hoverImage || reduced || !mobileQuery.matches) return
+      if (!hoverImage || reduced || !mobileQuery.matches || !isActive) return
       autoHoverPaused = false
       if (autoHoverTimer !== undefined) window.clearInterval(autoHoverTimer)
       autoHoverTimer = window.setInterval(() => {
@@ -523,7 +549,6 @@ function makeStrap(
     card.addEventListener("mouseleave", resumeAutoHover)
     card.addEventListener("focusin", pauseAutoHover)
     card.addEventListener("focusout", resumeAutoHover)
-    root.addEventListener("lanyard:activate", onActivate)
     motionQuery.addEventListener("change", onMotionChange)
     card.addEventListener("pointerdown", onDown)
     card.addEventListener("pointermove", onMove)
@@ -537,16 +562,18 @@ function makeStrap(
     let t = 0
     let isVisible = true
     let pageVisible = !document.hidden
-    const mobileQuery = window.matchMedia('(max-width: 800px)')
     let isActive = !mobileQuery.matches || root.closest('.personas-slide')?.classList.contains('is-active') === true
+    const canRun = (now: number) => isVisible && pageVisible && (isActive || now - tug.updatedAt < 500)
     const tick = (now: number) => {
       acc += Math.min(0.05, (now - last) / 1000)
       last = now
+      const mobile = mobileQuery.matches
       let steps = 0
       while (acc >= STEP && steps < 8) {
         acc -= STEP
         steps++
         t += STEP
+        if (mobile && !reduced) movePins(now)
         if (drag) {
           const T = pts[iT]
           T.px = T.x
@@ -555,18 +582,22 @@ function makeStrap(
           T.y += (drag.ty - T.y) * 0.35
         }
         const C = pts[iC]
-        if (!reduced && !drag) {
+        if (!reduced && !mobile && !drag) {
           // a draught in the room, so the badge is never perfectly still
           C.x += (22 * Math.sin(t * 0.7) + 12 * Math.sin(t * 1.9)) * STEP * STEP
         }
-        integrate(pts, STEP, GRAVITY, 0.992)
+        integrate(pts, STEP, GRAVITY, mobile ? 0.948 : 0.992)
         solve(pts, links, ITER)
-        const vx = (C.x - C.px) / STEP
-        spinStep(spin, spinTarget, STEP, vx * 0.03 + (reduced ? 0 : 0.6 * Math.sin(t * 0.5)))
+        if (mobile) {
+          if (!reduced) spinStep(spin, spinTarget, STEP, 0, 400, 40)
+        } else {
+          const vx = (C.x - C.px) / STEP
+          spinStep(spin, spinTarget, STEP, vx * 0.03 + (reduced ? 0 : 0.6 * Math.sin(t * 0.5)))
+        }
       }
       draw()
       place()
-      if (isVisible && pageVisible && isActive) {
+      if (canRun(now)) {
         raf = requestAnimationFrame(tick)
       } else {
         raf = 0
@@ -574,7 +605,7 @@ function makeStrap(
     }
 
     const syncLoop = () => {
-      if (!isVisible || !pageVisible || !isActive) {
+      if (!canRun(performance.now())) {
         cancelAnimationFrame(raf)
         raf = 0
         return
@@ -593,17 +624,17 @@ function makeStrap(
       pageVisible = !document.hidden
       syncLoop()
     }
+    const onPull = (event: Event) => {
+      if (reduced || !mobileQuery.matches) return
+      const offset = (event as CustomEvent<{ offset: number }>).detail.offset
+      tug.target = offset
+      tug.updatedAt = performance.now()
+      syncLoop()
+    }
     const onSlideVisibility = (event: Event) => {
       isActive = !mobileQuery.matches || Boolean((event as CustomEvent<{ active?: boolean }>).detail?.active)
-        if (isActive) {
-          build()
-          draw()
-          place()
-          if (mobileQuery.matches) resumeAutoHover()
-          else pauseAutoHover()
-      } else {
-        pauseAutoHover()
-      }
+      if (isActive && mobileQuery.matches) resumeAutoHover()
+      else pauseAutoHover()
       syncLoop()
     }
     const onBreakpointChange = () => {
@@ -621,6 +652,7 @@ function makeStrap(
     }
     visibilityObserver.observe(root)
     document.addEventListener('visibilitychange', onVisibilityChange)
+    root.addEventListener('lanyard:pull', onPull)
     root.addEventListener('lanyard:visibility', onSlideVisibility)
     mobileQuery.addEventListener('change', onBreakpointChange)
 
@@ -653,6 +685,7 @@ function makeStrap(
       root.classList.remove('is-dragging')
       visibilityObserver.disconnect()
       document.removeEventListener('visibilitychange', onVisibilityChange)
+      root.removeEventListener('lanyard:pull', onPull)
       root.removeEventListener('lanyard:visibility', onSlideVisibility)
       mobileQuery.removeEventListener('change', onBreakpointChange)
       if (autoHoverTimer !== undefined) window.clearInterval(autoHoverTimer)
@@ -663,7 +696,6 @@ function makeStrap(
       card.removeEventListener('mouseleave', resumeAutoHover);
       card.removeEventListener('focusin', pauseAutoHover);
       card.removeEventListener('focusout', resumeAutoHover);
-      root.removeEventListener('lanyard:activate', onActivate);
       card.removeEventListener('keydown', onKeyDown);
       card.removeEventListener('pointerdown', onDown);
       card.removeEventListener('pointermove', onMove);
