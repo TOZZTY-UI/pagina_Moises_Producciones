@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "",
+    "label": "Inicio",
+    "href": "/",
+    "sectionId": "inicio"
+  },
+  {
+    "slug": "personas",
+    "label": "Personas",
+    "href": "/#personas",
+    "sectionId": "personas"
+  }
+]

@@ -1,6 +1,6 @@
 
 ---
-import { sidebarLinks } from '../../../data/navigation';
+import { navigation } from '../../../lib/navigation';
 
 interface NavItem {
   name: string;
@@ -16,9 +16,7 @@ interface Props {
 const {
   brand = "SaxEventos",
   logo = "/icons/logo.webp",
-  items = sidebarLinks
-    .filter((item) => item.sectionId)
-    .map(({ label, sectionId }) => ({ name: label, href: `/#${sectionId}` })),
+  items = navigation.map(({ label, href }) => ({ name: label, href })),
 } = Astro.props;
 ---
 
