@@ -29,15 +29,6 @@ gsap.registerPlugin(ScrollTrigger);
       const indicator =
         this.querySelector<HTMLElement>(".nav-indicator");
 
-      const progress =
-        this.querySelector<HTMLElement>("[data-scroll-progress]");
-      const progressFill =
-        progress?.querySelector<HTMLElement>(".scroll-progress__fill");
-      const progressMarker =
-        progress?.querySelector<HTMLElement>(".scroll-progress__marker");
-      const progressValue =
-        progress?.querySelector<HTMLElement>(".scroll-progress__value");
-
       const links = this.querySelectorAll<HTMLAnchorElement>(".nav-link");
       const allSectionLinks = this.querySelectorAll<HTMLAnchorElement>(
         "[data-section]"
@@ -45,35 +36,6 @@ gsap.registerPlugin(ScrollTrigger);
       const reduceMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       );
-      const progressEase = "power3.out";
-      const progressDuration = reduceMotion.matches ? 0 : 0.55;
-
-      const updateProgress = (value: number) => {
-        if (!progress || !progressFill) return;
-
-        const progressY = value * progress.clientHeight;
-
-        gsap.to(progressFill, {
-          scaleY: value,
-          duration: progressDuration,
-          ease: progressEase,
-          overwrite: "auto",
-        });
-
-        gsap.to([progressMarker, progressValue].filter(Boolean), {
-          y: progressY,
-          duration: progressDuration,
-          ease: progressEase,
-          overwrite: "auto",
-        });
-
-        if (progressValue) {
-          progressValue.textContent = String(
-            Math.max(1, Math.round(value * 100))
-          );
-        }
-      };
-
       // Contraer el navbar al hacer scroll
       const updateScroll = () => {
         if (this.scrollFrame) return;
@@ -162,16 +124,13 @@ gsap.registerPlugin(ScrollTrigger);
         ScrollTrigger.create({
           start: 0,
           end: "max",
-          onUpdate: (self) => {
+          onUpdate: () => {
             setInitialSection();
-
-            updateProgress(self.progress);
           },
         })
       );
 
       setInitialSection();
-      updateProgress(0);
       ScrollTrigger.refresh();
 
       // Abrir y cerrar menú móvil
