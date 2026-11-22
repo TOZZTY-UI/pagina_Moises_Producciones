@@ -1,5 +1,7 @@
-// Centro del panel del flash en la fotografía original (1672 × 941).
+// Centro del panel blanco del flash, medido en píxeles sobre cada foto original.
 const flashPoint = { x: 564 / 1672, y: 149 / 941 };
+const mobileFlashPoint = { x: 318 / 941, y: 447 / 1672 };
+const tabletFlashPoint = { x: 603 / 1586, y: 140 / 992 };
 
 export function playCameraFlash(
   flash: HTMLElement,
@@ -10,6 +12,12 @@ export function playCameraFlash(
   if (document.hidden || !image.complete || !naturalWidth || !naturalHeight) return;
 
   const photo = image.getBoundingClientRect();
+  // <picture> usa una composición distinta en móvil, tablet y escritorio.
+  const point = window.matchMedia('(max-width: 600px)').matches
+    ? mobileFlashPoint
+    : window.matchMedia('(max-width: 1100px)').matches
+      ? tabletFlashPoint
+      : flashPoint;
   const [positionX, positionY] = getComputedStyle(image).objectPosition
     .split(/\s+/)
     .map((percent) => Number.parseFloat(percent) / 100);
@@ -18,8 +26,8 @@ export function playCameraFlash(
   const scale = Math.max(photo.width / naturalWidth, photo.height / naturalHeight);
   const width = naturalWidth * scale;
   const height = naturalHeight * scale;
-  const x = (photo.width - width) * positionX + width * flashPoint.x;
-  const y = (photo.height - height) * positionY + height * flashPoint.y;
+  const x = (photo.width - width) * positionX + width * point.x;
+  const y = (photo.height - height) * positionY + height * point.y;
   const screenY = photo.top + y;
 
   if (!(x > 0 && x < photo.width && y > 0 && y < photo.height &&

@@ -1,10 +1,24 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 import BackGround from '../../assets/hero.png';
+import MobileBackground from '../../assets/heroMovil.png';
+import TabletBackground from '../../assets/heroTablet.png';
 import InteractiveHoverButton from '../../components/ux/InteractiveHoverButton/InteractiveHoverButton.astro';
 
 import '../../components/ux/InteractiveHoverButton/interactive-hover-button.css';
 import './Hero.css';
+
+const mobileHeroImage = await getImage({
+  src: MobileBackground,
+  width: 960,
+  format: 'webp',
+});
+
+const tabletHeroImage = await getImage({
+  src: TabletBackground,
+  width: 1600,
+  format: 'webp',
+});
 ---
 
 <section
@@ -15,15 +29,25 @@ import './Hero.css';
 >
   <!-- IMAGEN Y MÁSCARA DE REVELADO -->
   <div class="hero__image-mask">
-    <Image
-      class="hero__image"
-      src={BackGround}
-      alt=""
-      widths={[640, 960, 1280, 1680]}
-      sizes="100vw"
-      loading="eager"
-      fetchpriority="high"
-    />
+    <picture class="hero__picture">
+      <source
+        media="(max-width: 600px)"
+        srcset={mobileHeroImage.src}
+      />
+      <source
+        media="(min-width: 601px) and (max-width: 1100px)"
+        srcset={tabletHeroImage.src}
+      />
+      <Image
+        class="hero__image"
+        src={BackGround}
+        alt=""
+        widths={[640, 960, 1280, 1680]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </picture>
     <span class="hero__camera-exposure" aria-hidden="true"></span>
   </div>
 

@@ -37,7 +37,6 @@ if (hero && !hero.dataset.heroAnimationReady) {
 
     const root = document.documentElement;
     const body = document.body;
-    let hasPlayedFlash = false;
     const cta = hero.querySelector<HTMLAnchorElement>('.hero__cta');
     const reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
@@ -77,6 +76,8 @@ if (hero && !hero.dataset.heroAnimationReady) {
       footerStart: 2.15,
       footerDuration: 0.75,
     };
+
+    let flashTimer: number | undefined;
 
 
     /* ========================================
@@ -133,6 +134,73 @@ if (hero && !hero.dataset.heroAnimationReady) {
       () => {
         let cameraFlashPlayback:
           ReturnType<typeof playCameraFlash> | undefined;
+        let remainingFlashes = 4;
+
+        const scheduleCameraFlash = () => {
+          if (document.hidden || remainingFlashes === 0) return;
+
+          window.clearTimeout(flashTimer);
+          flashTimer = window.setTimeout(() => {
+            flashTimer = undefined;
+            if (!flash || !exposure) {
+              scheduleCameraFlash();
+              return;
+            }
+
+            remainingFlashes -= 1;
+            cameraFlashPlayback = playCameraFlash(
+              flash,
+              exposure,
+              image
+            );
+
+            if (cameraFlashPlayback) {
+              cameraFlashPlayback.finished.then(
+                scheduleCameraFlash,
+                scheduleCameraFlash
+              );
+            } else {
+              scheduleCameraFlash();
+            }
+          }, 3500 + Math.random() * 5500);
+        };
+
+        const handleVisibilityChange = () => {
+          if (document.hidden) {
+            window.clearTimeout(flashTimer);
+            flashTimer = undefined;
+          } else {
+            scheduleCameraFlash();
+          }
+        };
+
+        const shootCameraFlash = () => {
+          if (!flash || !exposure) return;
+
+          cameraFlashPlayback = playCameraFlash(
+            flash,
+            exposure,
+            image
+          );
+
+          if (cameraFlashPlayback) {
+            cameraFlashPlayback.finished.then(
+              () => {
+                setScrollLock(false);
+                scheduleCameraFlash();
+              },
+              () => {
+                setScrollLock(false);
+                scheduleCameraFlash();
+              }
+            );
+          } else {
+            setScrollLock(false);
+            scheduleCameraFlash();
+          }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
 
         setScrollLock(true);
 
@@ -187,22 +255,8 @@ if (hero && !hero.dataset.heroAnimationReady) {
               clearProps: 'filter,transform',
             });
 
-            if (flash && exposure && !hasPlayedFlash) {
-              cameraFlashPlayback = playCameraFlash(
-                flash,
-                exposure,
-                image
-              );
-              hasPlayedFlash = Boolean(cameraFlashPlayback);
-
-              if (cameraFlashPlayback) {
-                cameraFlashPlayback.finished.then(
-                  () => setScrollLock(false),
-                  () => setScrollLock(false)
-                );
-              } else {
-                setScrollLock(false);
-              }
+            if (flash && exposure) {
+              shootCameraFlash();
             } else {
               setScrollLock(false);
             }
@@ -304,6 +358,8 @@ if (hero && !hero.dataset.heroAnimationReady) {
         /* LIMPIEZA */
 
         return () => {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+          window.clearTimeout(flashTimer);
           cameraFlashPlayback?.cancel();
           setScrollLock(false);
           timeline.kill();
