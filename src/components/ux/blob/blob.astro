@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  image?: ImageMetadata | string;
+  alt?: string;
+  imagePosition?: string;
+}
+
+const { image, alt = '', imagePosition = '50% 18%' } = Astro.props;
+---
+<div class="container">
+  <div class="shape">
+    {image && typeof image === 'string' ? (
+      <img
+        class="shape__image"
+        src={image}
+        alt={alt}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        style={`object-position:${imagePosition}`}
+      />
+    ) : image ? (
+      <Image
+        class="shape__image"
+        src={image}
+        alt={alt}
+        widths={[480, 720, 960]}
+        sizes="(max-width: 700px) 78vw, 42vw"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        style={`object-position:${imagePosition}`}
+      />
+    ) : null}
+  </div>
+</div>
+
+<style>
+  @import './blob.css';
+</style>

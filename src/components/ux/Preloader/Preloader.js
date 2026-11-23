@@ -5,9 +5,9 @@
     const words = [
       "Hola",
       "Hello",
-      "Bonjour",
       "Bienvenidos",
-      "SaxoEventos"
+      "a",
+      "SaxEventos Producciones"
     ];
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -55,12 +55,13 @@
           requestAnimationFrame(morph);
         }
 
-        window.setTimeout(() => {
+        // Entrega la pantalla al hero cuando la cortina ya ha salido.
+        Promise.allSettled(loader.getAnimations().map((animation) => animation.finished)).then(() => {
+          loader.remove();
+          document.documentElement.style.overflow = previousOverflow;
           document.documentElement.dataset.preloaderFinished = 'true';
           window.dispatchEvent(new CustomEvent('preloader:complete'));
-          loader?.remove();
-          document.documentElement.style.overflow = previousOverflow;
-        }, reduced ? 0 : 1050);
+        });
       }, delay);
     }
 

@@ -1,0 +1,49 @@
+
+.container {
+  align-items: center;
+  display: flex;
+  min-height: min(62svh, 42rem);
+  justify-content: center;
+  width: 100%;
+}
+
+.shape {
+  aspect-ratio: 1;
+  background: var(--palette-red, #8e1a23);
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  height: auto;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+  transition: border-radius 1s ease-in-out;
+  width: min(34rem, 100%);
+  z-index: 5;
+  animation: morph 8s ease-in-out infinite;
+}
+
+.shape__image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+@keyframes morph {
+  0% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+
+  50% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shape {
+    animation: none;
+  }
+}

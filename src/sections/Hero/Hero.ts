@@ -4,6 +4,18 @@ import { playCameraFlash } from './HeroFlash';
 const hero = document.querySelector<HTMLElement>('.hero');
 
 if (hero && !hero.dataset.heroAnimationReady) {
+  // Una recarga con `/#personas` debe volver a empezar desde la portada.
+  // El hash se conserva cuando el usuario navega con un clic, pero no debe
+  // hacer que el navegador salte detrás del loader y luego repita el salto.
+  const initialHash = window.location.hash;
+  if (initialHash) {
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${window.location.search}`
+    );
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }
 
   const sheen = hero.querySelector<HTMLElement>(
     '.hero__sheen'
@@ -42,21 +54,33 @@ if (hero && !hero.dataset.heroAnimationReady) {
       '(prefers-reduced-motion: reduce)'
     );
 
-    cta?.addEventListener('click', (event) => {
-      if (!cta.hash) return;
+    let introFinished = false;
+    let pendingLink: HTMLAnchorElement | undefined;
 
-      const target = document.querySelector<HTMLElement>(cta.hash);
+    const followSection = (link: HTMLAnchorElement) => {
+      const target = document.getElementById(link.dataset.section || link.hash.slice(1));
       if (!target) return;
 
-      event.preventDefault();
-
+      if (location.hash !== link.hash) {
+        history.pushState(history.state, '', location.pathname + location.search + link.hash);
+      }
       target.scrollIntoView({
         behavior: reduceMotion.matches ? 'auto' : 'smooth',
         block: 'start',
       });
+    };
 
-      history.pushState(null, '', cta.hash);
-    });
+    document.addEventListener('click', (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href]') : null;
+      if (!link || (link.target && link.target !== '_self') || link.hasAttribute('download')) return;
+      if (link !== cta && (introFinished || !link.dataset.section)) return;
+      if (link.origin !== location.origin || link.pathname !== location.pathname) return;
+
+      event.preventDefault();
+      if (introFinished) followSection(link);
+      else pendingLink = link;
+    }, { capture: true });
 
 
     /* ========================================
@@ -96,6 +120,18 @@ if (hero && !hero.dataset.heroAnimationReady) {
       );
     };
 
+    const finishIntro = () => {
+      if (introFinished) return;
+      introFinished = true;
+      hero.removeAttribute('data-hero-intro');
+      setScrollLock(false);
+      hero.dispatchEvent(new Event('hero:intro-complete'));
+      if (pendingLink) {
+        followSection(pendingLink);
+        pendingLink = undefined;
+      }
+    };
+
 
     /* ========================================
        ACCESIBILIDAD
@@ -104,10 +140,6 @@ if (hero && !hero.dataset.heroAnimationReady) {
     media.add(
       '(prefers-reduced-motion: reduce)',
       () => {
-
-        setScrollLock(false);
-
-        hero.removeAttribute('data-hero-intro');
 
         gsap.set(sheen, {
           autoAlpha: 0,
@@ -121,6 +153,7 @@ if (hero && !hero.dataset.heroAnimationReady) {
           autoAlpha: 1,
           clearProps: 'filter,transform',
         });
+        finishIntro();
       }
     );
 
@@ -132,21 +165,18 @@ if (hero && !hero.dataset.heroAnimationReady) {
     media.add(
       '(prefers-reduced-motion: no-preference)',
       () => {
+        if (introFinished) return;
+        let disposed = false;
         let cameraFlashPlayback:
           ReturnType<typeof playCameraFlash> | undefined;
         let remainingFlashes = 4;
 
         const scheduleCameraFlash = () => {
-          if (document.hidden || remainingFlashes === 0) return;
+          if (disposed || !introFinished || document.hidden || remainingFlashes === 0 || !flash || !exposure) return;
 
           window.clearTimeout(flashTimer);
           flashTimer = window.setTimeout(() => {
             flashTimer = undefined;
-            if (!flash || !exposure) {
-              scheduleCameraFlash();
-              return;
-            }
-
             remainingFlashes -= 1;
             cameraFlashPlayback = playCameraFlash(
               flash,
@@ -165,42 +195,18 @@ if (hero && !hero.dataset.heroAnimationReady) {
           }, 3500 + Math.random() * 5500);
         };
 
-        const handleVisibilityChange = () => {
-          if (document.hidden) {
-            window.clearTimeout(flashTimer);
-            flashTimer = undefined;
-          } else {
-            scheduleCameraFlash();
-          }
-        };
-
         const shootCameraFlash = () => {
-          if (!flash || !exposure) return;
-
-          cameraFlashPlayback = playCameraFlash(
-            flash,
-            exposure,
-            image
-          );
+          const afterFlash = () => {
+            if (disposed) return;
+            finishIntro();
+            scheduleCameraFlash();
+          };
+          cameraFlashPlayback = flash && exposure ? playCameraFlash(flash, exposure, image) : undefined;
 
           if (cameraFlashPlayback) {
-            cameraFlashPlayback.finished.then(
-              () => {
-                setScrollLock(false);
-                scheduleCameraFlash();
-              },
-              () => {
-                setScrollLock(false);
-                scheduleCameraFlash();
-              }
-            );
-          } else {
-            setScrollLock(false);
-            scheduleCameraFlash();
-          }
+            cameraFlashPlayback.finished.then(afterFlash, afterFlash);
+          } else afterFlash();
         };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
 
         setScrollLock(true);
 
@@ -238,14 +244,12 @@ if (hero && !hero.dataset.heroAnimationReady) {
         /* TIMELINE */
 
         const timeline = gsap.timeline({
-
+          paused: true,
           defaults: {
             ease: 'power3.out',
           },
 
           onComplete: () => {
-
-            hero.removeAttribute('data-hero-intro');
 
             gsap.set(image, {
               clearProps: 'transform',
@@ -255,11 +259,7 @@ if (hero && !hero.dataset.heroAnimationReady) {
               clearProps: 'filter,transform',
             });
 
-            if (flash && exposure) {
-              shootCameraFlash();
-            } else {
-              setScrollLock(false);
-            }
+            shootCameraFlash();
           },
         });
 
@@ -351,22 +351,34 @@ if (hero && !hero.dataset.heroAnimationReady) {
 
               duration: config.footerDuration,
             },
-            config.footerStart
-          );
+             config.footerStart
+           );
 
+        const waitingForLoader = () => root.dataset.preloaderFinished !== 'true' && !!document.getElementById('preloader');
+        const startReveal = () => {
+          if (!waitingForLoader() && !document.hidden && timeline.progress() < 1) timeline.play();
+        };
+        const handleVisibilityChange = () => {
+          if (document.hidden) {
+            timeline.pause();
+            window.clearTimeout(flashTimer);
+          } else if (introFinished) scheduleCameraFlash();
+          else startReveal();
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        if (waitingForLoader()) window.addEventListener('preloader:complete', startReveal, { once: true });
+        else startReveal();
 
         /* LIMPIEZA */
 
         return () => {
+          disposed = true;
+          window.removeEventListener('preloader:complete', startReveal);
           document.removeEventListener('visibilitychange', handleVisibilityChange);
           window.clearTimeout(flashTimer);
           cameraFlashPlayback?.cancel();
-          setScrollLock(false);
           timeline.kill();
-
-          hero.removeAttribute('data-hero-intro');
-
-          setScrollLock(false);
+          finishIntro();
         };
 
       }

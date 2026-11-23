@@ -17,6 +17,7 @@ interface Props {
   strapText?: string;
   strapLabel?: string;
   strapColor?: string;
+  cordColor?: string;
   inkColor?: string;
   cardColor?: string;
   flipButton?: boolean;
@@ -37,9 +38,10 @@ const {
   profileLabel = 'Ver perfil',
   strapText = 'the future is handmade',
   strapLabel = 'DESIGN WEEK 2026',
-  strapColor = '#141312',
-  inkColor = '#b59a6c',
-  cardColor = '#e8dfcc',
+  strapColor = '#161516',
+  cordColor = '#B38E59',
+  inkColor = '#B38E59',
+  cardColor = '#8E1A23',
   flipButton = true,
   cardWidth = 240,
   height = '100svh',
@@ -54,26 +56,28 @@ const s = cw / 240;
 const angles = Array.from({ length: 16 }, (_, i) => i * 22.5);
 const hasFront = Astro.slots.has('front');
 const hasBack = Astro.slots.has('back');
+import Button from '../Button/Button.astro';
 import './LanyardBadge.css';
+import '../Button/button.css';
 ---
 <section
   class:list={['lanyard-root', className]}
-  style={`height:${height};--badge-width:${cw}px;--badge-height:${ch}px;--badge-ring:${ringR}px;--badge-clip:${clipH}px;--badge-strap:${strapColor};--badge-ink:${inkColor};--badge-card:${cardColor}`}
+   style={`height:${height};--badge-width:${cw}px;--badge-height:${ch}px;--badge-ring:${ringR}px;--badge-clip:${clipH}px;--badge-strap:${strapColor};--badge-cord:${cordColor};--badge-ink:${inkColor};--badge-card:${cardColor}`}
   data-lanyard-badge
   data-card-width={cw}
   data-strap-text={strapText}
-  data-strap-label={strapLabel}
-  data-strap-color={strapColor}
-  data-ink-color={inkColor}
+   data-strap-label={strapLabel}
+   data-strap-color={strapColor}
+   data-cord-color={cordColor}
+   data-ink-color={inkColor}
 >
   <canvas class="lanyard-canvas" aria-hidden="true"></canvas>
 
   <div
     class="lanyard-card"
-    role="button"
+    role="group"
     tabindex="0"
-    aria-label="Credencial interactiva. Arrastra para balancear y pulsa para girar."
-    aria-pressed="false"
+    aria-label="Credencial interactiva. Arrastra para balancear y pulsa para girar. Usa el enlace del reverso para ver el perfil."
   >
     <div class="badge-clip" aria-hidden="true"></div>
     <div class="lanyard-inner">
@@ -132,7 +136,7 @@ import './LanyardBadge.css';
               {angles.slice(0, 8).map((_, i) => <path d="M0 -25 C 12 -38, 10 -50, 0 -58 C -10 -50, -12 -38, 0 -25" transform={`rotate(${i * 45})`} />)}
               <circle r="6" fill="currentColor" />
             </svg>
-            <div class="back-copy" style={`left:${22*s}px;top:${70*s}px;color:${strapColor}`}>
+             <div class="back-copy" style={`left:${22*s}px;top:${70*s}px;color:#B38E59`}>
               <svg viewBox="-100 -100 200 200" fill="none" stroke="currentColor" stroke-width="1.4"
                 style={`display:block;width:${26*s}px;color:${inkColor}`} aria-hidden="true">
                 <circle r="96" /><circle r="86" /><circle r="60" /><circle r="25" />
@@ -141,11 +145,11 @@ import './LanyardBadge.css';
                 {angles.slice(0, 8).map((_, i) => <path d="M0 -25 C 12 -38, 10 -50, 0 -58 C -10 -50, -12 -38, 0 -25" transform={`rotate(${i * 45})`} />)}
                 <circle r="6" fill="currentColor" />
               </svg>
-              <div style={`width:${16*s}px;height:${2*s}px;background:${strapColor};margin:${14*s}px 0 ${8*s}px`}></div>
-              <div class="back-name" style={`font-size:${17*s}px`}>{name}</div>
-              <div class="back-role" style={`font-size:${7*s}px;margin-top:${3*s}px`}>{role}</div>
+               <div style={`width:${16*s}px;height:${2*s}px;background:#B38E59;margin:${14*s}px 0 ${8*s}px`}></div>
+               <div class="back-name" style={`font-size:${22*s}px`}>{name}</div>
+               <div class="back-role" style={`font-size:${10*s}px;margin-top:${5*s}px`}>{role}</div>
             </div>
-             <div class="back-panel" style={`height:44%;background:${strapColor};border-top-left-radius:${40*s}px;color:${cardColor}`}>
+              <div class="back-panel" style={`height:44%;background:${strapColor};border-top-left-radius:${40*s}px;color:#B38E59`}>
               <svg class="ornament" viewBox="-100 -100 200 200" fill="none" stroke="currentColor" stroke-width="1.4"
                 style={`width:${230*s}px;left:${-20*s}px;top:${-40*s}px;opacity:.85`} aria-hidden="true">
                 <circle r="96" /><circle r="86" /><circle r="60" /><circle r="25" />
@@ -158,12 +162,14 @@ import './LanyardBadge.css';
                 style={`width:${12*s}px;height:${220*s}px;left:${150*s}px;top:${-40*s}px;transform:rotate(62deg)`} aria-hidden="true">
                 <path d="M10 4 L10 196 M3 18 L10 4 L17 18 M4 182 L10 170 L16 182 M4 194 L10 182 L16 194" />
                </svg>
-               {profileHref && (
-                <a class="profile-link" href={profileHref}>
-                  {profileLabel}
-                  <span aria-hidden="true">↗</span>
-                </a>
-               )}
+                {profileHref && (
+                   <Button
+                    href={profileHref}
+                    text={profileLabel}
+                    className="lanyard-profile-button"
+                    aria-label={profileLabel}
+                  />
+                )}
               </div>
           </div>
         )}

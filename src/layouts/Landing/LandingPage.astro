@@ -6,9 +6,22 @@ import Menu from "../../components/ux/menu/menu.astro";
 interface Props {
   title?: string;
   showPreloader?: boolean;
+  personPage?: boolean;
+  navColor?: string;
+  navMuted?: string;
 }
 
-const { title = "Moisés Producciones", showPreloader = true } = Astro.props;
+const {
+  title = "Moisés Producciones",
+  showPreloader = true,
+  personPage = false,
+  navColor,
+  navMuted,
+} = Astro.props;
+
+const navStyle = navColor || navMuted
+  ? `--person-nav-color:${navColor ?? ''};--person-nav-muted:${navMuted ?? ''}`
+  : undefined;
 ---
 
 <html lang="es">
@@ -17,13 +30,14 @@ const { title = "Moisés Producciones", showPreloader = true } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
   </head>
-  <body>
-    <!-- {showPreloader && <Preloader />} -->
+  <body style={navStyle}>
 
-    <Menu />
+    {showPreloader && <Preloader />}
+    <Menu compact={personPage} />
     <slot />
     <div id="page-curtain" aria-hidden="true"></div>
     <Footer />
+    
   </body>
 </html>
 

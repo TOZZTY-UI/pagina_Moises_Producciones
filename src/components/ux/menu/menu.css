@@ -1,8 +1,8 @@
   resizable-navbar {
-    --nav-background: 255, 255, 255;
-    --nav-color: #171717;
-    --nav-muted: #525252;
-    --nav-hover: #ededed;
+    --nav-background: 22, 21, 22;
+    --nav-color: var(--person-nav-color, #b38e59);
+    --nav-muted: var(--person-nav-muted, #9f8f97);
+    --nav-hover: #8e1a23;
 
     display: block;
     position: relative;
@@ -116,6 +116,10 @@
     transition: color 200ms ease;
   }
 
+  resizable-navbar[data-compact] .nav-container {
+    max-width: 1280px;
+  }
+
   .nav-link.is-active,
   .mobile-link.is-active {
     color: var(--nav-color);
@@ -183,8 +187,8 @@
   }
 
   .primary {
-    background: #171717;
-    color: #fff;
+    background: var(--palette-blue-light, #b38e59);
+    color: var(--palette-night, #161516);
 
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.15),
@@ -192,7 +196,8 @@
   }
 
   .primary:hover {
-    background: #333;
+      background: var(--palette-red, #8e1a23);
+      color: var(--palette-blue-light, #b38e59);
   }
 
   /* Hamburguesa */
@@ -248,7 +253,7 @@
 
   a:focus-visible,
   button:focus-visible {
-    outline: 2px solid #818cf8;
+    outline: 2px solid var(--palette-blue-light, #b38e59);
     outline-offset: 4px;
   }
 
@@ -340,19 +345,20 @@
   /* Modo oscuro */
   @media (prefers-color-scheme: dark) {
     resizable-navbar {
-      --nav-background: 20, 20, 20;
-      --nav-color: #fafafa;
-      --nav-muted: #d4d4d4;
-      --nav-hover: #292929;
+      --nav-background: 22, 21, 22;
+      --nav-color: var(--person-nav-color, #b38e59);
+      --nav-muted: var(--person-nav-muted, #9f8f97);
+      --nav-hover: var(--person-nav-hover, #8e1a23);
     }
 
     .primary {
-      background: #fafafa;
-      color: #171717;
+      background: #b38e59;
+      color: #161516;
     }
 
     .primary:hover {
-      background: #e5e5e5;
+      background: #8e1a23;
+      color: #b38e59;
     }
   }
 

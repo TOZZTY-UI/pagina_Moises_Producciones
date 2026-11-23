@@ -12,13 +12,21 @@ const imageUrls = import.meta.glob("../../assets/**/*", {
 
 const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
 ---
-<section id="personas" class="personas-carousel" aria-label="Personas de Moisés Producciones" aria-roledescription="carousel">
+<section id="personas" class="personas-carousel" aria-labelledby="personas-title" aria-roledescription="carousel" data-stagger-reveal>
+  <h2 id="personas-title" class="personas-title" data-reveal-item>Nuestro Equipo</h2>
+  <p id="personas-subtitle" class="personas-subtitle" data-reveal-item>
+    Conoce al equipo detrás de cada experiencia.
+  </p>
+  <p class="personas-interaction-hint" data-reveal-item aria-hidden="true">
+    Toca una tarjeta para descubrir su perfil
+  </p>
+
   <NoiseField
-    color="#8f73ff"
-    background="#0b0b0f"
+    color="var(--palette-blue, #8e1a23)"
+    background="var(--palette-night, #161516)"
     opacity={0.3}
     scale={1}
-    speed={6}
+    animated={false}
     className="personas-noise"
   />
   <div class="personas-controls" role="group" aria-label="Controles de personas" hidden>
@@ -46,6 +54,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
     return (
       <div
         class:list={['personas-slide', index === 0 && 'is-active']}
+          data-reveal-item
           role="group"
           aria-roledescription="slide"
           aria-label={`${index + 1} de ${personas.length}: ${person.name}`}
@@ -58,12 +67,12 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
           frontImage={resolveImage(person.LanyardBadgefront)}
           frontImageHover={resolveImage(person.LanyardBadgehover)}
           frontImageAlt={person.frontImageAlt}
-          profileHref={`/${person.slug}`}
+          profileHref={`/personas/${person.slug}`}
           strapText="hola"
           strapLabel="PRODUCCIONES"
-          strapColor="#141312"
-          inkColor="#b59a6c"
-          cardColor="#e8dfcc"
+          strapColor="#06070a"
+          inkColor="#000000"
+          cardColor="#ffffff"
           cardWidth={240}
           height="100svh"
           flipButton={false}

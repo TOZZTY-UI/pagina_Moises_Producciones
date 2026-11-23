@@ -1,5 +1,63 @@
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
   const curtain = document.querySelector('#page-curtain');
   let animating = false;
+  let curtainAnimation: Animation | null = null;
+
+  const resetCurtain = () => {
+    if (!curtain) return;
+
+    curtainAnimation?.cancel();
+    curtainAnimation = null;
+    curtain.style.clipPath = 'polygon(-60% 0, -30% 0, -5% 100%, -60% 100%)';
+    animating = false;
+  };
+
+  // pageshow también se dispara cuando el navegador restaura la página
+  // desde el back-forward cache. La cortina no debe conservar el estado
+  // cubierto de la navegación anterior.
+  window.addEventListener('pageshow', resetCurtain);
+
+  const revealSections = () => {
+    const sections = document.querySelectorAll<HTMLElement>('[data-stagger-reveal]');
+    if (!sections.length) return;
+
+    const motion = gsap.matchMedia();
+
+    motion.add('(prefers-reduced-motion: no-preference)', () => {
+      sections.forEach((section) => {
+        const items = section.querySelectorAll<HTMLElement>('[data-reveal-item]');
+        if (!items.length) return;
+
+        gsap.from(items, {
+          opacity: 0,
+          y: 32,
+          duration: 0.8,
+          ease: 'power3.out',
+          stagger: 0.12,
+          clearProps: 'transform',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 82%',
+            end: 'bottom 18%',
+            toggleActions: 'play reverse play reverse',
+            invalidateOnRefresh: true,
+          },
+        });
+      });
+
+      ScrollTrigger.refresh();
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', revealSections, { once: true });
+  } else {
+    revealSections();
+  }
 
   document.addEventListener('click', async (event) => {
     const target = event.target;
@@ -35,7 +93,7 @@
     const duration = 650;
     let fallback: number | undefined;
     try {
-      const animation = curtain.animate(
+      curtainAnimation = curtain.animate(
         [{ clipPath: initial }, { clipPath: covered }],
         {
           duration,
@@ -44,7 +102,7 @@
         },
       );
       await Promise.race([
-        animation.finished,
+        curtainAnimation.finished,
         new Promise<void>((resolve) => { fallback = window.setTimeout(resolve, duration + 150); }),
       ]);
     } catch {

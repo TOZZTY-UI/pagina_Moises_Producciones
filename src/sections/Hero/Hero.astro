@@ -3,9 +3,9 @@ import { getImage, Image } from 'astro:assets';
 import BackGround from '../../assets/hero.png';
 import MobileBackground from '../../assets/heroMovil.png';
 import TabletBackground from '../../assets/heroTablet.png';
-import InteractiveHoverButton from '../../components/ux/InteractiveHoverButton/InteractiveHoverButton.astro';
+import Button from '../../components/ux/Button/Button.astro';
 
-import '../../components/ux/InteractiveHoverButton/interactive-hover-button.css';
+import '../../components/ux/Button/button.css';
 import './Hero.css';
 
 const mobileHeroImage = await getImage({
@@ -78,7 +78,7 @@ const tabletHeroImage = await getImage({
       Música en vivo y fotografía para eventos
     </p>
 
-    <InteractiveHoverButton
+    <Button
       href="#personas"
       text="Conoce al equipo"
       className="hero__cta"

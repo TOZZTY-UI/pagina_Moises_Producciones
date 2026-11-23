@@ -1,0 +1,18 @@
+---
+interface Props {
+  href?: string;
+  text?: string;
+  className?: string;
+  type?: 'button' | 'submit' | 'reset';
+  [key: string]: unknown;
+}
+
+const { href, text = 'Button', className, type = 'button', ...attributes } = Astro.props as Props;
+const classes = ['btn', className].filter(Boolean).join(' ');
+---
+
+{href ? (
+  <a {...attributes} href={href} class={classes}>{text}</a>
+) : (
+  <button {...attributes} type={type} class={classes}>{text}</button>
+)}

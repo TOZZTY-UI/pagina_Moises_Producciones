@@ -8,20 +8,24 @@ interface NavItem {
   sectionId?: string;
 }
 
-interface Props {
+export interface Props {
   items?: NavItem[];
   brand?: string;
   logo?: string;
+  compact?: boolean;
 }
 
 const {
   brand = "SaxEventos",
   logo = "/icons/logo.webp",
+  compact = false,
   items = navigation.map(({ label, href, sectionId }) => ({ name: label, href, sectionId })),
 } = Astro.props;
+
+const visibleItems = compact ? items.filter((item) => !item.sectionId) : items;
 ---
 
-<resizable-navbar>
+<resizable-navbar data-compact={compact ? '' : undefined}>
   <header class="navbar">
     <div class="nav-container">
 
@@ -32,11 +36,11 @@ const {
       </a>
 
       <!-- Navegación escritorio -->
-      <nav class="nav-links" aria-label="Navegación principal">
+      <nav class="nav-links" aria-label="Navegación principal" hidden={compact}>
         <span class="nav-indicator" aria-hidden="true"></span>
 
         {
-          items.map((item) => (
+              visibleItems.map((item) => (
             <a href={item.href} class="nav-link" data-section={item.sectionId}>
               {item.name}
             </a>

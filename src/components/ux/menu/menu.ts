@@ -67,10 +67,27 @@ gsap.registerPlugin(ScrollTrigger);
       };
 
       let activeSection = "";
+      const hero = document.getElementById("inicio");
+
+      const syncUrlWithSection = (sectionId: string) => {
+        if (!document.getElementById(sectionId)) return;
+
+        const nextUrl =
+          sectionId === "inicio"
+            ? `${window.location.pathname}${window.location.search}`
+            : `${window.location.pathname}${window.location.search}#${sectionId}`;
+
+        const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+        if (currentUrl !== nextUrl) {
+          window.history.replaceState(window.history.state, "", nextUrl);
+        }
+      };
 
       const setActiveSection = (sectionId: string) => {
         if (activeSection === sectionId) return;
         activeSection = sectionId;
+        syncUrlWithSection(sectionId);
 
         allSectionLinks.forEach((link) => {
           const isActive = link.dataset.section === sectionId;
@@ -95,6 +112,7 @@ gsap.registerPlugin(ScrollTrigger);
       );
 
       const setInitialSection = () => {
+        if (hero?.hasAttribute("data-hero-intro")) return;
         const marker = window.scrollY + window.innerHeight * 0.55;
         const visibleSections = sectionLinks
           .map((link) => {
@@ -132,6 +150,10 @@ gsap.registerPlugin(ScrollTrigger);
 
       setInitialSection();
       ScrollTrigger.refresh();
+      hero?.addEventListener("hero:intro-complete", () => {
+        ScrollTrigger.refresh();
+        setInitialSection();
+      }, { signal });
 
       // Abrir y cerrar menú móvil
       const setOpen = (open: boolean) => {

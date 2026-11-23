@@ -1,12 +1,20 @@
 :root {
-  --negro: #11100e;
-  --negro-70: rgb(17 16 14 / 70%);
-  --dorado: #c9a55a;
-  --marfil: #f4eee2;
-  --color-bg: #f4eee2;
-  --color-card: #2b2924;
-  --color-text-muted: #9a958b;
-  --burdeos: #6f2b2b;
+  /* Paleta: tinta, burdeos, dorado y malva. */
+  --palette-night: #161516;
+  --palette-blue: #8e1a23;
+  --palette-blue-deep: #161516;
+  --palette-blue-light: #b38e59;
+  --palette-red: #8e1a23;
+  --palette-white: #b38e59;
+
+  --negro: var(--palette-night);
+  --negro-70: rgb(22 21 22 / 70%);
+  --dorado: #b38e59;
+  --marfil: var(--palette-white);
+  --color-bg: var(--palette-night);
+  --color-card: var(--palette-blue-deep);
+  --color-text-muted: #9f8f97;
+  --burdeos: var(--palette-red);
   font-family: system-ui, sans-serif;
   color: var(--negro);
   background: var(--color-bg);
@@ -37,7 +45,7 @@ body {
   padding: clamp(8rem, 18vw, 12rem) clamp(1.5rem, 9vw, 9rem) 7rem;
   overflow: hidden;
   background:
-    radial-gradient(circle at 76% 38%, rgb(201 165 90 / 18%), transparent 22rem),
+    radial-gradient(circle at 76% 38%, rgb(142 26 35 / 30%), transparent 22rem),
     var(--color-bg);
 }
 
@@ -48,9 +56,9 @@ body {
   bottom: -30vw;
   width: min(70vw, 720px);
   aspect-ratio: 1;
-  border: 1px solid rgb(17 16 14 / 12%);
+   border: 1px solid rgb(179 142 89 / 35%);
   border-radius: 50%;
-  box-shadow: 0 0 0 5vw rgb(17 16 14 / 2%), 0 0 0 10vw rgb(17 16 14 / 2%);
+   box-shadow: 0 0 0 5vw rgb(142 26 35 / 8%), 0 0 0 10vw rgb(142 26 35 / 4%);
   content: '';
 }
 
@@ -138,7 +146,7 @@ body {
     position: fixed;
     inset: 0;
     z-index: 99999;
-    background: #151515;
+     background: var(--palette-night);
     pointer-events: none;
     clip-path: polygon(-60% 0, -30% 0, -5% 100%, -60% 100%);
   }

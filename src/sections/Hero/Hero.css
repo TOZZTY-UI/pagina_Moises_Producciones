@@ -35,8 +35,8 @@
   overflow: hidden;
   box-sizing: border-box;
 
-  background: #171313;
-  color: #fff;
+  background: var(--palette-night, #161516);
+  color: var(--palette-white, #b38e59);
 }
 
 
@@ -217,6 +217,13 @@
 html.hero-scroll-locked,
 body.hero-scroll-locked {
   overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Sin recorrido, tampoco el foco ni un enlace de sección pueden adelantar la intro. */
+body.hero-scroll-locked {
+  height: 100svh;
+  overflow: clip;
 }
 
 
@@ -313,7 +320,7 @@ body.hero-scroll-locked {
 
   max-width: 25ch;
 
-  color: #fff;
+  color: var(--palette-white, #b38e59);
 
   font-size: clamp(0.9rem, 1.3vw, 1.1rem);
   line-height: 1.35;
@@ -327,12 +334,9 @@ body.hero-scroll-locked {
 ======================================== */
 
 .hero__cta {
-  --color-bg: #171313;
-  --color-card: rgb(244 238 226 / 92%);
-  --color-text: #171313;
-  --color-accent: #c9a55a;
-
-  border-color: rgb(255 255 255 / 80%);
+  border-color: var(--palette-blue-light, #b38e59);
+  background-color: var(--palette-blue-light, #b38e59);
+  color: var(--palette-night, #161516);
 }
 
 

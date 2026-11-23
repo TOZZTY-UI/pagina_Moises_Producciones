@@ -9,6 +9,64 @@
     z-index: 0;
   }
 
+  .personas-title {
+    position: absolute;
+    inset-block-start: 6rem;
+    inset-inline: 1rem;
+    z-index: 2;
+    margin: 0;
+    color: var(--marfil, #fff);
+    font-size: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -.04em;
+    text-align: center;
+    -webkit-text-stroke: 1px var(--palette-night, #161516);
+    paint-order: stroke fill;
+    text-shadow: 0 3px 12px rgb(22 21 22 / 85%);
+    pointer-events: none;
+  }
+
+  .personas-subtitle {
+    position: absolute;
+    inset-block-start: clamp(9rem, 14vw, 11rem);
+    inset-inline: 1rem;
+    z-index: 2;
+    max-width: 34rem;
+    margin: 0 auto;
+    color: var(--color-text-muted, #9f8f97);
+    font-size: clamp(1rem, .85rem + .55vw, 1.3rem);
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+    text-wrap: balance;
+    -webkit-text-stroke: .35px var(--palette-night, #161516);
+    paint-order: stroke fill;
+    text-shadow: 0 2px 8px rgb(22 21 22 / 90%);
+    pointer-events: none;
+  }
+
+  .personas-interaction-hint {
+    position: absolute;
+    inset-block-start: clamp(12rem, 18vw, 14rem);
+    inset-inline: 1rem;
+    z-index: 2;
+    margin: 0 auto;
+    color: var(--palette-blue-light, #b38e59);
+    font-size: .9rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    text-wrap: balance;
+    text-shadow: 0 2px 8px rgb(22 21 22 / 90%);
+    pointer-events: none;
+    animation: personas-hint-pulse 2.4s ease-in-out 2;
+  }
+
+  @keyframes personas-hint-pulse {
+    0%, 100% { opacity: .6; }
+    50% { opacity: 1; }
+  }
+
   .personas-controls,
   .personas-grid,
   .personas-status {
@@ -46,10 +104,10 @@
     width: 44px;
     height: 44px;
     padding: 0;
-    border: 1px solid rgb(255 255 255 / .45);
+    border: 1px solid rgb(179 142 89 / .8);
     border-radius: 50%;
-    background: rgb(20 19 18 / .72);
-    color: #e8dfcc;
+    background: rgb(22 21 22 / .92);
+    color: var(--palette-white, #b38e59);
     cursor: pointer;
     pointer-events: auto;
     touch-action: manipulation;
@@ -61,7 +119,7 @@
   }
 
   .personas-control:focus-visible {
-    outline: 2px solid #141312;
+    outline: 2px solid var(--palette-blue-light, #b38e59);
     outline-offset: 3px;
   }
 
@@ -122,5 +180,11 @@
   @media (max-width: 800px) and (prefers-reduced-motion: no-preference) {
     .personas-grid {
       scroll-behavior: smooth;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .personas-interaction-hint {
+      animation: none;
     }
   }

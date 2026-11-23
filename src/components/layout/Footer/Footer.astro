@@ -46,7 +46,7 @@ const doodles = [
 
 ---
 
-<footer id="contacto" class="dcf" data-footer>
+<footer id="contacto" class="dcf" data-footer data-stagger-reveal>
   <div class="dcf-world">
     <div class="dcf-stage">
       <div class="dcf-doodles" aria-hidden="true">
@@ -58,7 +58,7 @@ const doodles = [
           ))
         }
       </div>
-      <h2 class="dcf-wordmark" aria-label={wordmark}>
+      <h2 class="dcf-wordmark" aria-label={wordmark} data-reveal-item>
         {
           wordmark
             .toUpperCase()
@@ -80,7 +80,7 @@ const doodles = [
     
   </div>
   <br />
-  <div class="dcf-bar">
+  <div class="dcf-bar" data-reveal-item>
     <p>{copyright}</p>
     {
       socialLinks.length > 0 && (

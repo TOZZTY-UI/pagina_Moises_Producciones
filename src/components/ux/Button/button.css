@@ -1,0 +1,58 @@
+/*
+ * From Uiverse.io by Zena4L
+ */
+
+.btn {
+  position: relative;
+  z-index: 0;
+  display: inline-block;
+  padding: 10px 30px;
+  border: 1px solid;
+  border-radius: 1000px;
+  background-color: var(--palette-blue-light, #b38e59);
+  color: var(--palette-night, #161516);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+.btn::after {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  border-radius: 100px;
+  content: '';
+  transition: transform .3s ease, opacity .3s ease;
+}
+
+.btn:hover {
+  background-color: var(--palette-red, #8e1a23);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgb(22 21 22 / 50%);
+}
+
+.btn:hover::after {
+  background-color: var(--palette-red, #8e1a23);
+  transform: scaleX(1.4) scaleY(1.5);
+  opacity: 0;
+}
+
+.btn:active {
+  transform: translateY(-3px);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--palette-blue-light, #b38e59);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn::after {
+    transition: none;
+  }
+}

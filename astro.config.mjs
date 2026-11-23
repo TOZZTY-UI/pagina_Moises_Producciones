@@ -6,10 +6,6 @@ export default defineConfig({
   site: 'https://producciones.saxeventos.cl',
   output: 'static',
   compressHTML: true,
-  redirects: {
-    '/personas/[slug]': '/[slug]',
-  },
-
   vite: {
     plugins: [tailwindcss()],
     build: {

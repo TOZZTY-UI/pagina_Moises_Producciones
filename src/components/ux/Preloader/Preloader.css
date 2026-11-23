@@ -2,7 +2,7 @@
     position: fixed;
     inset: 0;
     z-index: 99999;
-    background: #151515;
+    background: var(--palette-night, #161516);
     color: white;
     transition: transform 1s cubic-bezier(.76, 0, .24, 1);
   }
@@ -33,7 +33,7 @@
     width: 100%;
     height: 140px;
     bottom: -139px;
-    fill: #151515;
+    fill: var(--palette-night, #161516);
   }
 
   #preloader.hide {
