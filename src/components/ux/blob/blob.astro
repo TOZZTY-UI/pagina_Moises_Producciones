@@ -9,6 +9,7 @@ interface Props {
 }
 
 const { image, alt = '', imagePosition = '50% 18%' } = Astro.props;
+const imageMetadata = image && typeof image !== 'string' ? image : undefined;
 ---
 <div class="container">
   <div class="shape">
@@ -22,11 +23,13 @@ const { image, alt = '', imagePosition = '50% 18%' } = Astro.props;
         decoding="async"
         style={`object-position:${imagePosition}`}
       />
-    ) : image ? (
+    ) : imageMetadata ? (
       <Image
         class="shape__image"
-        src={image}
+        src={imageMetadata}
         alt={alt}
+        width={imageMetadata.width}
+        height={imageMetadata.height}
         widths={[480, 720, 960]}
         sizes="(max-width: 700px) 78vw, 42vw"
         loading="eager"
