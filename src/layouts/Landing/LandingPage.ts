@@ -16,9 +16,9 @@ const setupLenis = () => {
     smoothWheel: true,
   });
 
-  const scrollSections = [
-    ...document.querySelectorAll<HTMLElement>('main[data-section-scroller] > section'),
-  ];
+  const scrollSections = document.querySelectorAll<HTMLElement>(
+    'main[data-section-scroller] > section:not(.personas-carousel)',
+  );
   let blurReset: gsap.core.Tween | null = null;
   const blurWhileScrolling = ({ velocity }: { velocity: number }) => {
     const blur = Math.min(3.5, Math.abs(velocity) * 0.012);
@@ -33,7 +33,7 @@ const setupLenis = () => {
   };
 
   lenis.on('scroll', ScrollTrigger.update);
-  lenis.on('scroll', blurWhileScrolling);
+  if (scrollSections.length) lenis.on('scroll', blurWhileScrolling);
 
   const updateLenis = (time: number) => {
     lenis.raf(time * 1000);
@@ -77,7 +77,7 @@ const setupLenis = () => {
 
     motion.add('(prefers-reduced-motion: no-preference)', () => {
       const scrollSections = document.querySelectorAll<HTMLElement>(
-        'main[data-section-scroller] > section',
+        'main[data-section-scroller] > section:not(.personas-carousel)',
       );
 
       scrollSections.forEach((section) => {
@@ -104,43 +104,15 @@ const setupLenis = () => {
       });
 
       sections.forEach((section) => {
-        const allItems = Array.from(
-          section.querySelectorAll<HTMLElement>('[data-reveal-item]'),
-        );
-        const introItems = section.matches('.personas-carousel')
-          ? allItems.filter((item) =>
-              item.matches('.personas-title, .personas-subtitle, .personas-interaction-hint'),
-            )
-          : [];
-        const items = introItems.length
-          ? allItems.filter((item) => !introItems.includes(item))
-          : allItems;
+        const items = section.querySelectorAll<HTMLElement>('[data-reveal-item]');
         if (!items.length) return;
-
-        if (introItems.length) {
-          gsap.from(introItems, {
-            opacity: 0,
-            y: 28,
-            duration: 0.7,
-            ease: 'power3.out',
-            stagger: 0.2,
-            clearProps: 'transform',
-            scrollTrigger: {
-              trigger: section,
-              start: 'top 82%',
-              end: 'bottom 18%',
-              toggleActions: 'play none none none',
-              invalidateOnRefresh: true,
-            },
-          });
-        }
-
+        const personasIntro = section.matches('.personas-carousel');
         gsap.from(items, {
           opacity: 0,
-          y: 32,
-          duration: 0.8,
+          y: personasIntro ? 28 : 32,
+          duration: personasIntro ? 0.7 : 0.8,
           ease: 'power3.out',
-          stagger: 0.12,
+          stagger: personasIntro ? 0.2 : 0.12,
           clearProps: 'transform',
           scrollTrigger: {
             trigger: section,

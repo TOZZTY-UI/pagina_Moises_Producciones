@@ -3,9 +3,7 @@ import { getImage, Image } from 'astro:assets';
 import BackGround from '../../assets/hero.png';
 import MobileBackground from '../../assets/heroMovil.png';
 import TabletBackground from '../../assets/heroTablet.png';
-import Button from '../../components/ux/Button/Button.astro';
 
-import '../../components/ux/Button/button.css';
 import './Hero.css';
 
 const mobileHeroImage = await getImage({
@@ -67,8 +65,8 @@ const tabletHeroImage = await getImage({
   <!-- CONTENIDO PRINCIPAL -->
   <div class="hero__content">
     <div class="hero__title-wrap">
-        <h1 id="hero-title">Música para tus momentos</h1>
-        <p>SaxEventos Producciones</p>
+      <h1 id="hero-title">Música para tus momentos</h1>
+      <p>SaxEventos Producciones</p>
     </div>
   </div>
 
@@ -78,14 +76,7 @@ const tabletHeroImage = await getImage({
       Música en vivo y fotografía para bodas, celebraciones y eventos corporativos.
     </p>
 
-    <Button
-      href="https://wa.me/56949251898?text=Hola%20SaxEventos%2C%20quiero%20cotizar%20un%20evento."
-      text="Cotizar por WhatsApp"
-      className="hero__cta"
-      aria-label="Cotizar un evento por WhatsApp"
-      target="_blank"
-      rel="noopener noreferrer"
-    />
+
     <a class="hero__secondary-cta" href="#servicios">Ver qué hacemos</a>
   </div>
 </section>

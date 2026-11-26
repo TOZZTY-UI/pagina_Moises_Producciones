@@ -234,16 +234,10 @@
     align-items: center;
     min-height: 46px;
     padding: 0 20px;
-    border: 2px solid var(--ink);
-    border-radius: 999px;
-    background: var(--ink);
-    color: var(--paper) !important;
-    font-size: 14px;
-    font-weight: 750;
+    /* Apariencia controlada por .button2 (global) */
   }
   .dcf-btn.outline {
-    background: var(--paper);
-    color: var(--ink) !important;
+    /* Apariencia controlada por .button2 (global) */
   }
   .dcf-bar {
     display: flex;
@@ -300,12 +294,7 @@
   }
   .dcf-totop {
     padding: 6px 12px;
-    border: 1px solid;
-    border-radius: 999px;
-    background: none;
-    color: inherit;
-    font: inherit;
-    font-weight: 700;
+    /* Apariencia (color, fondo, borde) controlada por .button2 (global) */
     cursor: pointer;
   }
   @keyframes hop {

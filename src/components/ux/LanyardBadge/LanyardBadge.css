@@ -17,6 +17,7 @@
   .badge-back { background: var(--badge-card); transform: rotateY(180deg); }
   .badge-image { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
   .badge-image--hover { position: absolute; inset: 0; opacity: 0; transition: opacity 220ms ease-out; }
+  .lanyard-root[data-disable-hover="true"] .badge-image--hover { opacity: 0; animation: none; transition: none; }
   .lanyard-card:focus-visible .badge-image--hover { opacity: 1; }
   @media (hover: hover) {
     .lanyard-card:hover .badge-image--hover { opacity: 1; }

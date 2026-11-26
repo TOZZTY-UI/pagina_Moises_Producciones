@@ -164,6 +164,7 @@ function makeStrap(
     const ctx = canvas?.getContext('2d');
     if (!canvas || !card || !ctx) return;
     if (backFace) backFace.inert = true;
+    const flipEnabled = root.dataset.disableFlip !== 'true';
 
     const cw = Number(root.dataset.cardWidth || 240);
     const ch = Math.round(cw * 1.5);
@@ -178,7 +179,7 @@ function makeStrap(
     };
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const mobileQuery = window.matchMedia('(max-width: 800px)');
-    const section = root.closest<HTMLElement>('.personas-carousel');
+    const stage = root.closest<HTMLElement>('.personas-stage');
     const slide = root.closest('.personas-slide');
     const sw = Math.max(14, Math.round(cw * 0.1)) // strap width
     const lowLen = sw * 2.2 // buckle to ring
@@ -203,19 +204,20 @@ function makeStrap(
     let ink: { x: number; y: number; width: number; height: number } | undefined
 
     const resizeCanvas = (acrossSection: boolean) => {
-      expanded = acrossSection && !!section
+      expanded = acrossSection && !!stage
       let width = W
       let height = H
       canvasX = canvasY = 0
-      if (expanded && section) {
+      if (expanded && stage) {
         // Only the bitmap changes coordinate space. The pins and pointer stay
         // in badge coordinates, so the cord can follow across every column.
-        const area = section.getBoundingClientRect()
+        const area = stage.getBoundingClientRect()
         const origin = root.getBoundingClientRect()
-        canvasX = area.left - origin.left
-        canvasY = area.top - origin.top
-        width = area.width
-        height = area.height
+        const scale = origin.width / W
+        canvasX = (area.left - origin.left) / scale
+        canvasY = (area.top - origin.top) / scale
+        width = area.width / scale
+        height = area.height / scale
       }
       const pxWidth = Math.ceil(width * dpr)
       const pxHeight = Math.ceil(height * dpr)
@@ -406,7 +408,7 @@ function makeStrap(
     }
 
     // ---- interaction -----------------------------------------------------
-    type Drag = { id: number; startX: number; startY: number; pinX: number; pinY: number; tx: number; ty: number; active: boolean }
+    type Drag = { id: number; startX: number; startY: number; scale: number; pinX: number; pinY: number; tx: number; ty: number; active: boolean }
     let drag: Drag | null = null
     const flip = () => {
       const flipped = card.classList.toggle('is-flipped')
@@ -415,11 +417,15 @@ function makeStrap(
       flipButton?.setAttribute("aria-pressed", String(flipped))
       if (flipLabel) flipLabel.textContent = flipped ? "Mostrar frente" : "Mostrar reverso"
     }
+    const showFront = () => {
+      if (card.classList.contains('is-flipped')) flip()
+    }
     const onDown = (e: PointerEvent) => {
       if (e.button !== 0 || !e.isPrimary || drag) return
       if ((e.target as Element).closest("a, button")) return
       const T = pts[iT]
-      drag = { id: e.pointerId, startX: e.pageX, startY: e.pageY, pinX: T.x, pinY: T.y, tx: T.x, ty: T.y, active: false }
+      const scale = root.getBoundingClientRect().width / W
+      drag = { id: e.pointerId, startX: e.pageX, startY: e.pageY, scale, pinX: T.x, pinY: T.y, tx: T.x, ty: T.y, active: false }
       card.setPointerCapture(e.pointerId)
     }
     const clearPointer = () => {
@@ -446,8 +452,8 @@ function makeStrap(
         if (!expanded) resizeCanvas(true)
         root.classList.add('is-dragging')
       }
-      drag.tx = drag.pinX + dx
-      drag.ty = drag.pinY + dy
+      drag.tx = drag.pinX + dx / drag.scale
+      drag.ty = drag.pinY + dy / drag.scale
       wake()
     }
     const onUp = (e: PointerEvent) => {
@@ -457,13 +463,13 @@ function makeStrap(
       if (wasDragging) {
         if (motionQuery.matches) rebuild()
         else wake() // Let the badge swing back before retiring the wide canvas.
-      } else if (e.type === 'pointerup') {
+      } else if (e.type === 'pointerup' && flipEnabled) {
         flip()
       }
     }
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.target !== card) return
-      if (e.key === "Enter" || e.key === " ") {
+      if (flipEnabled && (e.key === "Enter" || e.key === " ")) {
         e.preventDefault()
         flip()
       }
@@ -504,7 +510,10 @@ function makeStrap(
       while (acc >= STEP) {
         acc -= STEP
         steps++
-        if (mobile) movePins(now)
+        // The vertical scroll train also pulls the two top pins on desktop.
+        // Keeping this in the same Verlet loop makes the strap lag behind
+        // the card instead of translating as a rigid block.
+        movePins(now)
         if (drag?.active) {
           const T = pts[iT]
           T.px = T.x
@@ -518,7 +527,7 @@ function makeStrap(
       if (steps) {
         const T = pts[iT]
         const atTarget = !drag?.active || Math.abs(drag.tx - T.x) + Math.abs(drag.ty - T.y) < 0.15
-        const pinsStill = !mobile || (now - tug.updatedAt > 64 && Math.abs(tug.x) < 0.1 && Math.abs(tug.v) < 0.5)
+        const pinsStill = now - tug.updatedAt > 64 && Math.abs(tug.x) < 0.1 && Math.abs(tug.v) < 0.5
         const still = atTarget && pinsStill && pts.every(p => !p.w || Math.abs(p.x - p.px) + Math.abs(p.y - p.py) < 0.07)
         // Require several quiet steps: a pendulum is also still for one instant at its apex.
         quietFor = still ? quietFor + steps * STEP : 0
@@ -567,7 +576,7 @@ function makeStrap(
       syncVisibility()
     })
     const onPull = (event: Event) => {
-      if (motionQuery.matches || !mobileQuery.matches) return
+      if (motionQuery.matches) return
       const offset = (event as CustomEvent<{ offset: number }>).detail.offset
       tug.target = offset
       tug.updatedAt = performance.now()
@@ -585,7 +594,7 @@ function makeStrap(
       if (motionQuery.matches && (moving || expanded)) rebuild()
     }
     card.addEventListener('keydown', onKeyDown)
-    flipButton?.addEventListener('click', flip)
+    if (flipEnabled) flipButton?.addEventListener('click', flip)
     card.addEventListener('pointerdown', onDown)
     card.addEventListener('pointermove', onMove)
     card.addEventListener('pointerup', onUp)
@@ -595,6 +604,7 @@ function makeStrap(
     document.addEventListener('visibilitychange', syncVisibility)
     root.addEventListener('lanyard:pull', onPull)
     root.addEventListener('lanyard:visibility', onSlideVisibility)
+    root.addEventListener('lanyard:show-front', showFront)
     mobileQuery.addEventListener('change', onBreakpointChange)
     motionQuery.addEventListener('change', onMotionChange)
 
@@ -620,10 +630,11 @@ function makeStrap(
       document.removeEventListener('visibilitychange', syncVisibility)
       root.removeEventListener('lanyard:pull', onPull)
       root.removeEventListener('lanyard:visibility', onSlideVisibility)
+      root.removeEventListener('lanyard:show-front', showFront)
       mobileQuery.removeEventListener('change', onBreakpointChange)
       observer.disconnect();
       motionQuery.removeEventListener('change', onMotionChange);
-      flipButton?.removeEventListener('click', flip);
+      if (flipEnabled) flipButton?.removeEventListener('click', flip);
       card.removeEventListener('keydown', onKeyDown);
       card.removeEventListener('pointerdown', onDown);
       card.removeEventListener('pointermove', onMove);

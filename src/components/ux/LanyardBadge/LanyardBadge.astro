@@ -21,6 +21,8 @@ interface Props {
   inkColor?: string;
   cardColor?: string;
   flipButton?: boolean;
+  disableFlip?: boolean;
+  disableHover?: boolean;
   cardWidth?: number;
   height?: string;
   className?: string;
@@ -43,6 +45,8 @@ const {
   inkColor = '#B38E59',
   cardColor = '#8E1A23',
   flipButton = true,
+  disableFlip = false,
+  disableHover = false,
   cardWidth = 240,
   height = '100svh',
   className = '',
@@ -70,15 +74,19 @@ import '../Button/button.css';
    data-strap-color={strapColor}
    data-cord-color={cordColor}
    data-ink-color={inkColor}
->
+   data-disable-flip={disableFlip ? 'true' : undefined}
+   data-disable-hover={disableHover ? 'true' : undefined}
+ >
   <canvas class="lanyard-canvas" aria-hidden="true"></canvas>
 
   <div
-    class="lanyard-card"
-    role="group"
-    tabindex="0"
-    aria-label="Credencial interactiva. Arrastra para balancear y pulsa para girar. Usa el enlace del reverso para ver el perfil."
-  >
+   class="lanyard-card"
+   role="group"
+   tabindex="0"
+   aria-label={disableFlip
+     ? "Credencial interactiva. Arrastra para balancear."
+     : "Credencial interactiva. Arrastra para balancear y pulsa para girar. Usa el enlace del reverso para ver el perfil."}
+ >
     <div class="badge-clip" aria-hidden="true"></div>
     <div class="lanyard-inner">
       <div class="badge-face badge-front">

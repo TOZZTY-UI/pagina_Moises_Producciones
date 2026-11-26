@@ -1,210 +1,377 @@
+.personas-carousel {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  min-height: 100svh;
+  box-sizing: border-box;
+  background: var(--palette-night, #161516);
+}
 
+.personas-stage {
+  position: relative;
+  min-height: 100svh;
+  isolation: isolate;
+}
+
+.personas-stage > .personas-noise {
+  z-index: -1;
+}
+
+.personas-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.personas-title {
+  position: absolute;
+  inset-block-start: 6rem;
+  inset-inline: 1rem;
+  z-index: 2;
+  margin: 0;
+  color: var(--marfil, #fff);
+  font-size: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -.04em;
+  text-align: center;
+  -webkit-text-stroke: 1px var(--palette-night, #161516);
+  paint-order: stroke fill;
+}
+
+.personas-subtitle {
+  position: absolute;
+  inset-block-start: clamp(9rem, 14vw, 11rem);
+  inset-inline: 1rem;
+  z-index: 2;
+  max-width: 34rem;
+  margin: 0 auto;
+  color: var(--color-text-muted, #9f8f97);
+  font-size: clamp(1rem, .85rem + .55vw, 1.3rem);
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+  -webkit-text-stroke: .35px var(--palette-night, #161516);
+  paint-order: stroke fill;
+}
+
+.personas-interaction-hint {
+  position: absolute;
+  inset-block-start: clamp(12rem, 18vw, 14rem);
+  inset-inline: 1rem;
+  z-index: 2;
+  margin: 0 auto;
+  color: var(--palette-blue-light, #b38e59);
+  font-size: .9rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+  pointer-events: none;
+  animation: personas-hint-pulse 2.4s ease-in-out 2;
+}
+
+@keyframes personas-hint-pulse {
+  0%, 100% { opacity: .6; }
+  50% { opacity: 1; }
+}
+
+.personas-controls,
+.personas-grid,
+.personas-details,
+.personas-status {
+  position: relative;
+  z-index: 1;
+}
+
+.personas-grid {
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 0;
+  transform-origin: center center;
+}
+
+.personas-slide {
+  flex: 0 0 calc(100% / var(--personas-count, 1));
+  min-width: 0;
+}
+
+.personas-controls {
+  display: none;
+  justify-content: space-between;
+  position: absolute;
+  top: 72%;
+  inset-inline: 1rem;
+  z-index: 999;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.personas-control {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgb(179 142 89 / .8);
+  border-radius: 50%;
+  background: rgb(22 21 22 / .92);
+  color: var(--palette-white, #b38e59);
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.personas-control:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+.personas-control:focus-visible {
+  outline: 2px solid var(--palette-blue-light, #b38e59);
+  outline-offset: 3px;
+}
+
+.personas-details {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.personas-detail {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: clamp(2rem, 14vw, 17rem);
+  inline-size: min(38rem, calc(50% - clamp(2rem, 4vw, 4rem)));
+  transform: translateY(-50%);
+  color: var(--palette-white, #f1eef0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.personas-detail-kicker {
+  margin: 0 0 .9rem;
+  color: var(--palette-blue-light, #b38e59);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.personas-detail h3 {
+  max-width: 10ch;
+  margin: 0;
+  color: var(--palette-white, #f1eef0);
+  font-size: clamp(2.4rem, 4.5vw, 5rem);
+  line-height: .92;
+  letter-spacing: -.06em;
+  text-wrap: balance;
+}
+
+.personas-detail-role {
+  margin: 1rem 0 0;
+  color: var(--palette-blue-light, #b38e59);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  font-weight: 700;
+}
+
+.personas-detail-description {
+  max-width: 37ch;
+  margin: 1.2rem 0 0;
+  color: var(--color-text-muted, #d6ccd0);
+  font-size: clamp(1rem, 1.2vw, 1.18rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.personas-detail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 44px;
+  margin-top: 1.7rem;
+  padding: .72rem 1.05rem;
+  border: 1px solid var(--palette-blue-light, #b38e59);
+  border-radius: 999px;
+  color: var(--palette-blue-light, #b38e59);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+  pointer-events: auto;
+  transition: background-color .2s ease, color .2s ease, transform .2s ease;
+}
+
+.personas-detail-link span {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.personas-detail-link:hover,
+.personas-detail-link:focus-visible {
+  background: var(--palette-blue-light, #b38e59);
+  color: var(--palette-night, #161516);
+}
+
+.personas-detail-link:hover {
+  transform: translateY(-2px);
+}
+
+.personas-detail-link:focus-visible {
+  outline: 2px solid var(--palette-white, #f1eef0);
+  outline-offset: 4px;
+}
+
+.personas-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The card has two portraits, but the team pass should begin on the normal one. */
+.personas-grid[data-view="group"] .lanyard-root[data-disable-hover="true"] .badge-image:not(.badge-image--hover) {
+  opacity: 1 !important;
+}
+
+.personas-grid[data-view="group"] .lanyard-root[data-disable-hover="true"] .badge-image--hover {
+  opacity: 0 !important;
+  animation: none !important;
+  transition: none;
+}
+
+.personas-grid[data-view="individual"] .lanyard-root[data-disable-hover="true"] .badge-image:not(.badge-image--hover) {
+  opacity: 0 !important;
+  transition: none;
+}
+
+.personas-grid[data-view="individual"] .lanyard-root[data-disable-hover="true"] .badge-image--hover {
+  opacity: 1 !important;
+  animation: none !important;
+  transition: none;
+}
+
+@media (min-width: 801px) {
   .personas-carousel {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
     min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-block: 0 2rem;
-    box-sizing: border-box;
   }
 
-  .personas-carousel > .personas-noise {
-    z-index: 0;
+  .personas-stage {
+    position: sticky;
+    inset-block-start: 0;
+    height: 100svh;
+    overflow: clip;
   }
 
   .personas-title {
-    position: absolute;
-    inset-block-start: 6rem;
-    inset-inline: 1rem;
-    z-index: 2;
-    margin: 0;
-    color: var(--marfil, #fff);
-    font-size: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
-    line-height: 1;
-    letter-spacing: -.04em;
-    text-align: center;
-    -webkit-text-stroke: 1px var(--palette-night, #161516);
-    paint-order: stroke fill;
-    pointer-events: none;
+    inset-block-start: auto;
+    inset-block-end: 14.5rem;
   }
 
   .personas-subtitle {
-    position: absolute;
-    inset-block-start: clamp(9rem, 14vw, 11rem);
-    inset-inline: 1rem;
-    z-index: 2;
-    max-width: 34rem;
-    margin: 0 auto;
-    color: var(--color-text-muted, #9f8f97);
-    font-size: clamp(1rem, .85rem + .55vw, 1.3rem);
-    font-weight: 500;
-    line-height: 1.4;
-    text-align: center;
-    text-wrap: balance;
-    -webkit-text-stroke: .35px var(--palette-night, #161516);
-    paint-order: stroke fill;
-    pointer-events: none;
+    inset-block-start: auto;
+    inset-block-end: 12rem;
   }
 
   .personas-interaction-hint {
-    position: absolute;
-    inset-block-start: clamp(12rem, 18vw, 14rem);
-    inset-inline: 1rem;
-    z-index: 2;
-    margin: 0 auto;
-    color: var(--palette-blue-light, #b38e59);
-    font-size: .9rem;
-    font-weight: 600;
-    line-height: 1.4;
-    text-align: center;
-    text-wrap: balance;
-    pointer-events: none;
-    animation: personas-hint-pulse 2.4s ease-in-out 2;
-  }
-
-  @keyframes personas-hint-pulse {
-    0%, 100% { opacity: .6; }
-    50% { opacity: 1; }
-  }
-
-  .personas-controls,
-  .personas-grid,
-  .personas-status {
-    position: relative;
-    z-index: 1;
-  }
-
-  @media (min-width: 801px) {
-    .personas-title {
-      inset-block-start: auto;
-      inset-block-end: 14.5rem;
-    }
-
-    .personas-subtitle {
-      inset-block-start: auto;
-      inset-block-end: 12rem;
-    }
-
-    .personas-interaction-hint {
-      inset-block-start: auto;
-      inset-block-end: 10rem;
-    }
+    inset-block-start: auto;
+    inset-block-end: 10rem;
   }
 
   .personas-grid {
-    position: relative;
-    width: 100%;
-    display: flex;
-    flex-flow: row nowrap;
-    gap: 0;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    height: 100%;
   }
 
   .personas-slide {
-    flex: 0 0 calc(100% / var(--personas-count, 1));
-    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+}
+
+@media (min-width: 801px) and (max-width: 60rem) {
+  .personas-detail {
+    inset-inline-start: 2rem;
+    inline-size: calc(50% - 2.5rem);
+  }
+}
+
+@media (max-width: 800px) {
+  .personas-stage {
+    overflow: hidden;
   }
 
-  .personas-controls {
-    display: none;
-    justify-content: space-between;
-    position: absolute;
-    top: 72%;
-    inset-inline: 1rem;
-    z-index: 999;
-    pointer-events: none;
-    transform: translateY(-50%);
-  }
-
-  .personas-control {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 1px solid rgb(179 142 89 / .8);
-    border-radius: 50%;
-    background: rgb(22 21 22 / .92);
-    color: var(--palette-white, #b38e59);
-    cursor: pointer;
-    pointer-events: auto;
+  .personas-grid {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
     touch-action: manipulation;
   }
 
-  .personas-control:disabled {
-    opacity: .3;
-    cursor: default;
+  .personas-grid::-webkit-scrollbar {
+    display: none;
   }
 
-  .personas-control:focus-visible {
-    outline: 2px solid var(--palette-blue-light, #b38e59);
-    outline-offset: 3px;
+  .personas-slide {
+    flex-basis: 100%;
+    /* Keep the oversized lanyard canvas inside its slide, not the scroll track. */
+    overflow: clip;
+    scroll-snap-align: start;
   }
 
-  .personas-status {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
+  .personas-grid .lanyard-root {
+    min-height: 35rem;
   }
 
-  @media (max-width: 800px) {
-    .personas-grid {
-      overflow-x: auto;
-      overflow-y: hidden;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-      touch-action: manipulation;
-    }
-
-    .personas-grid::-webkit-scrollbar {
-      display: none;
-    }
-
-    .personas-slide {
-      flex-basis: 100%;
-      /* Keep the oversized lanyard canvas inside its slide, not the scroll track. */
-      overflow: clip;
-      scroll-snap-align: start;
-    }
-
-    .personas-grid .lanyard-root {
-      min-height: 35rem;
-    }
-
-    .personas-grid .lanyard-card {
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    .personas-grid .lanyard-inner {
-      pointer-events: none;
-    }
-
-    .personas-grid .profile-link {
-      min-height: 44px;
-      font-size: .75rem;
-    }
-
-    .personas-controls:not([hidden]) {
-      display: flex;
-    }
+  .personas-grid .lanyard-card {
+    cursor: pointer;
+    touch-action: manipulation;
   }
 
-  @media (max-width: 800px) and (prefers-reduced-motion: no-preference) {
-    .personas-grid {
-      scroll-behavior: smooth;
-    }
+  .personas-grid .lanyard-inner {
+    pointer-events: none;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .personas-interaction-hint {
-      animation: none;
-    }
+  .personas-grid .profile-link {
+    min-height: 44px;
+    font-size: .75rem;
   }
+
+  .personas-controls:not([hidden]) {
+    display: flex;
+  }
+
+  .personas-details {
+    display: none;
+  }
+}
+
+@media (max-width: 800px) and (prefers-reduced-motion: no-preference) {
+  .personas-grid {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .personas-interaction-hint,
+  .personas-detail-link {
+    animation: none;
+    transition: none;
+  }
+}
