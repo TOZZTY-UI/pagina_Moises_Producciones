@@ -1,0 +1,33 @@
+---
+import './Servicios.css';
+
+const services = [
+  {
+    title: 'Música en vivo',
+    text: 'Saxofón, violín y guitarra para acompañar la llegada de tus invitados, la ceremonia, el cóctel o la fiesta.',
+  },
+  {
+    title: 'Fotografía de eventos',
+    text: 'Registro natural de las personas, la energía y los detalles que hacen que cada celebración sea irrepetible.',
+  },
+  {
+    title: 'Una propuesta a tu medida',
+    text: 'Conversemos sobre tu fecha, lugar y estilo para armar una experiencia que tenga sentido para tu evento.',
+  },
+];
+---
+
+<section id="servicios" class="conversion-section services-section" aria-labelledby="services-title" data-stagger-reveal>
+  <div class="conversion-section__intro" data-reveal-item>
+    <h2 id="services-title">Música para el momento.</h2>
+    <p>Una celebración se recuerda por cómo se sintió. Ponemos música, imagen y atención en los momentos que importan.</p>
+  </div>
+  <div class="services-list">
+    {services.map((service) => (
+      <article class="service-row" data-reveal-item>
+        <h3>{service.title}</h3>
+        <p>{service.text}</p>
+      </article>
+    ))}
+  </div>
+</section>

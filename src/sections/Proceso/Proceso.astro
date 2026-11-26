@@ -1,0 +1,24 @@
+---
+import './Proceso.css';
+
+const steps = [
+  ['Cuéntanos tu idea', 'Fecha, lugar, tipo de celebración y qué quieres que tus invitados recuerden.'],
+  ['Armamos la propuesta', 'Te recomendamos la combinación de música y fotografía que mejor se adapta a tu evento.'],
+  ['Lo hacemos realidad', 'Coordinamos cada detalle para que tú puedas disfrutar el momento.'],
+];
+---
+
+<section id="proceso" class="conversion-section process-section" aria-labelledby="process-title" data-stagger-reveal>
+  <div class="conversion-section__intro" data-reveal-item>
+    <h2 id="process-title">Simple desde el primer mensaje.</h2>
+    <p>Nos ocupamos de la producción para que tú puedas estar presente en tu propia celebración.</p>
+  </div>
+  <ol class="process-list">
+    {steps.map(([title, text]) => (
+      <li data-reveal-item>
+        <h3>{title}</h3>
+        <p>{text}</p>
+      </li>
+    ))}
+  </ol>
+</section>

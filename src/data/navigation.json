@@ -10,5 +10,17 @@
     "label": "Personas",
     "href": "/#personas",
     "sectionId": "personas"
+  },
+  {
+    "slug": "servicios",
+    "label": "Servicios",
+    "href": "/#servicios",
+    "sectionId": "servicios"
+  },
+  {
+    "slug": "faq",
+    "label": "FAQ",
+    "href": "/#faq",
+    "sectionId": "faq"
   }
 ]

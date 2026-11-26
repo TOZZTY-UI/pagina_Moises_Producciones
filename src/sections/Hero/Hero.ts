@@ -4,9 +4,6 @@ import { playCameraFlash } from './HeroFlash';
 const hero = document.querySelector<HTMLElement>('.hero');
 
 if (hero && !hero.dataset.heroAnimationReady) {
-  // Una recarga con `/#personas` debe volver a empezar desde la portada.
-  // El hash se conserva cuando el usuario navega con un clic, pero no debe
-  // hacer que el navegador salte detrás del loader y luego repita el salto.
   const initialHash = window.location.hash;
   if (initialHash) {
     window.history.replaceState(
@@ -101,9 +98,6 @@ if (hero && !hero.dataset.heroAnimationReady) {
       footerDuration: 0.75,
     };
 
-    let flashTimer: number | undefined;
-
-
     /* ========================================
        BLOQUEO DEL SCROLL
     ======================================== */
@@ -169,37 +163,27 @@ if (hero && !hero.dataset.heroAnimationReady) {
         let disposed = false;
         let cameraFlashPlayback:
           ReturnType<typeof playCameraFlash> | undefined;
-        let remainingFlashes = 4;
+        let lastTopFlash = 0;
 
-        const scheduleCameraFlash = () => {
-          if (disposed || !introFinished || document.hidden || remainingFlashes === 0 || !flash || !exposure) return;
-
-          window.clearTimeout(flashTimer);
-          flashTimer = window.setTimeout(() => {
-            flashTimer = undefined;
-            remainingFlashes -= 1;
-            cameraFlashPlayback = playCameraFlash(
-              flash,
-              exposure,
-              image
-            );
-
-            if (cameraFlashPlayback) {
-              cameraFlashPlayback.finished.then(
-                scheduleCameraFlash,
-                scheduleCameraFlash
-              );
-            } else {
-              scheduleCameraFlash();
-            }
-          }, 3500 + Math.random() * 5500);
+        const playFlash = () => {
+          if (disposed || !introFinished || document.hidden || !flash || !exposure) return;
+          cameraFlashPlayback?.cancel();
+          cameraFlashPlayback = playCameraFlash(flash, exposure, image);
         };
+
+        const heroEntryObserver = new IntersectionObserver(([entry]) => {
+          if (!entry.isIntersecting || window.scrollY > hero.offsetHeight * 0.22) return;
+          const now = performance.now();
+          if (now - lastTopFlash < 1200) return;
+          lastTopFlash = now;
+          playFlash();
+        }, { threshold: 0.8 });
+        heroEntryObserver.observe(hero);
 
         const shootCameraFlash = () => {
           const afterFlash = () => {
             if (disposed) return;
             finishIntro();
-            scheduleCameraFlash();
           };
           cameraFlashPlayback = flash && exposure ? playCameraFlash(flash, exposure, image) : undefined;
 
@@ -224,14 +208,14 @@ if (hero && !hero.dataset.heroAnimationReady) {
         });
 
         gsap.set(title, {
-          autoAlpha: 0,
-          y: 18,
-          filter: 'blur(16px)',
+          autoAlpha: 1,
+          y: 0,
+          filter: 'none',
         });
 
         gsap.set(footer, {
-          autoAlpha: 0,
-          y: 26,
+          autoAlpha: 1,
+          y: 0,
         });
 
         gsap.set(image, {
@@ -361,8 +345,7 @@ if (hero && !hero.dataset.heroAnimationReady) {
         const handleVisibilityChange = () => {
           if (document.hidden) {
             timeline.pause();
-            window.clearTimeout(flashTimer);
-          } else if (introFinished) scheduleCameraFlash();
+          }
           else startReveal();
         };
         document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -375,8 +358,8 @@ if (hero && !hero.dataset.heroAnimationReady) {
           disposed = true;
           window.removeEventListener('preloader:complete', startReveal);
           document.removeEventListener('visibilitychange', handleVisibilityChange);
-          window.clearTimeout(flashTimer);
           cameraFlashPlayback?.cancel();
+          heroEntryObserver.disconnect();
           timeline.kill();
           finishIntro();
         };

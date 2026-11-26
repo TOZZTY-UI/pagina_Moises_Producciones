@@ -12,7 +12,7 @@ const imageUrls = import.meta.glob("../../assets/**/*", {
 
 const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
 ---
-<section id="personas" class="personas-carousel" aria-labelledby="personas-title" aria-roledescription="carousel" data-stagger-reveal>
+<section id="personas" class="personas-carousel" role="region" aria-labelledby="personas-title" aria-describedby="personas-subtitle" aria-roledescription="carousel" data-stagger-reveal>
   <h2 id="personas-title" class="personas-title" data-reveal-item>Nuestro Equipo</h2>
   <p id="personas-subtitle" class="personas-subtitle" data-reveal-item>
     Conoce al equipo detrás de cada experiencia.
@@ -29,7 +29,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
     animated={false}
     className="personas-noise"
   />
-  <div class="personas-controls" role="group" aria-label="Controles de personas" hidden>
+  <div class="personas-controls" role="group" aria-label="Controles de personas">
     <button type="button" class="personas-control" data-direction="previous" aria-label="Persona anterior" aria-controls="personas-track" disabled>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="m15 18-6-6 6-6" />
@@ -45,6 +45,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
     id="personas-track"
     class="personas-grid"
     data-personas-track
+    data-lenis-prevent
     tabindex="0"
     role="group"
     aria-label="Credenciales"
@@ -74,7 +75,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
           inkColor="#000000"
           cardColor="#ffffff"
           cardWidth={240}
-          height="100svh"
+           height="clamp(32rem, 70svh, 48rem)"
           flipButton={false}
         />
       </div>

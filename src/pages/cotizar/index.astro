@@ -1,0 +1,36 @@
+---
+import LandingPage from '../../layouts/Landing/LandingPage.astro';
+import './index.css';
+
+const whatsappUrl =
+  'https://wa.me/56949251898?text=Hola%20SaxEventos%2C%20quiero%20cotizar%20un%20evento.';
+---
+
+<LandingPage title="Cotiza tu evento | SaxEventos Producciones" showPreloader={false} personPage>
+  <main class="quote-page">
+    <section class="quote-page__hero" aria-labelledby="quote-page-title">
+      <a class="quote-page__back" href="/">← Volver al inicio</a>
+      <div class="quote-page__content">
+        <p class="quote-page__label">Cotización</p>
+        <h1 id="quote-page-title">Hablemos de la celebración que estás preparando.</h1>
+        <p>Para recomendarte la mejor propuesta, escríbenos con la fecha, el lugar y el tipo de evento.</p>
+        <a class="quote-page__button" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+          Solicitar cotización por WhatsApp
+        </a>
+      </div>
+    </section>
+    <section class="quote-page__details" aria-labelledby="quote-details-title">
+      <div>
+        <h2 id="quote-details-title">Qué incluir en tu mensaje</h2>
+        <p>Con estos datos podremos responderte de forma más precisa.</p>
+      </div>
+      <ul>
+        <li>Fecha o rango de fechas</li>
+        <li>Ciudad y lugar del evento</li>
+        <li>Tipo de celebración</li>
+        <li>Servicio que te interesa</li>
+        <li>Horario aproximado</li>
+      </ul>
+    </section>
+  </main>
+</LandingPage>

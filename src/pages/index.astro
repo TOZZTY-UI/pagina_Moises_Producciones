@@ -1,12 +1,28 @@
 ---
-import LandingPage from '../layouts/Landing/LandingPage.astro';
-import Hero from '../sections/Hero/Hero.astro';
-import Personas from '../sections/Personas/Personas.astro';
+import LandingPage from "../layouts/Landing/LandingPage.astro";
 
+import Hero from "../sections/Hero/Hero.astro";
+import Personas from "../sections/Personas/Personas.astro";
+import Servicios from "../sections/Servicios/Servicios.astro";
+import Testimonios from "../sections/Testimonios/Testimonios.astro";
+import Proceso from "../sections/Proceso/Proceso.astro";
+import FAQ from "../sections/FAQ/FAQ.astro";
+import CTA from "../sections/CTA/CTA.astro";
 ---
-<LandingPage>
-  <main>
+
+<LandingPage
+  title="SaxEventos Producciones | Música en vivo y fotografía"
+  description="Música en vivo y fotografía para bodas, celebraciones y eventos corporativos."
+  showPreloader={false}
+  sectionScroll
+>
+  <main data-section-scroller>
     <Hero />
     <Personas />
+    <!-- <Servicios />
+    <FAQ />
+    <Testimonios />
+    <Proceso />
+    <CTA /> -->
   </main>
 </LandingPage>

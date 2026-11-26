@@ -260,17 +260,17 @@ body.hero-scroll-locked {
 
   text-align: right;
 
-  text-shadow: 0 2px 22px rgb(0 0 0 / 30%);
 }
 
 .hero__title-wrap h1 {
   margin: 0;
 
-  font-size: clamp(4.8rem, 13vw, 12rem);
+   max-width: min(12ch, 72vw);
+   font-size: clamp(3.2rem, 8.3vw, 8rem);
 
   font-weight: 700;
   letter-spacing: -0.08em;
-  line-height: 0.78;
+   line-height: 0.9;
 }
 
 .hero__title-wrap p {
@@ -307,7 +307,6 @@ body.hero-scroll-locked {
 
   padding-top: 1.25rem;
 
-  border-top: 1px solid rgb(255 255 255 / 40%);
 }
 
 
@@ -318,7 +317,7 @@ body.hero-scroll-locked {
 .hero__description {
   margin: 0;
 
-  max-width: 25ch;
+   max-width: 38ch;
 
   color: var(--palette-white, #b38e59);
 
@@ -337,6 +336,22 @@ body.hero-scroll-locked {
   border-color: var(--palette-blue-light, #b38e59);
   background-color: var(--palette-blue-light, #b38e59);
   color: var(--palette-night, #161516);
+}
+
+.hero__secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--palette-white, #b38e59);
+  font-size: .9rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: .35rem;
+}
+
+.hero__secondary-cta:focus-visible {
+  outline: 2px solid var(--palette-blue-light, #b38e59);
+  outline-offset: 4px;
 }
 
 
@@ -374,7 +389,8 @@ body.hero-scroll-locked {
   }
 
   .hero__title-wrap h1 {
-    font-size: clamp(3rem, 15vw, 7rem);
+    max-width: none;
+    font-size: clamp(2.7rem, 12.2vw, 5.5rem);
   }
 
   .hero__title-wrap p {
@@ -388,6 +404,10 @@ body.hero-scroll-locked {
     gap: 1rem;
 
     margin-bottom: 1.5rem;
+  }
+
+  .hero__secondary-cta {
+    align-self: flex-start;
   }
 }
 

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "testimonio-1",
+    "quote": "Reemplazar con una opinión autorizada del cliente.",
+    "name": "Nombre del cliente",
+    "event": "Tipo de evento",
+    "published": false
+  }
+]

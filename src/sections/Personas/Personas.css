@@ -3,6 +3,12 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-block: 0 2rem;
+    box-sizing: border-box;
   }
 
   .personas-carousel > .personas-noise {
@@ -22,7 +28,6 @@
     text-align: center;
     -webkit-text-stroke: 1px var(--palette-night, #161516);
     paint-order: stroke fill;
-    text-shadow: 0 3px 12px rgb(22 21 22 / 85%);
     pointer-events: none;
   }
 
@@ -41,7 +46,6 @@
     text-wrap: balance;
     -webkit-text-stroke: .35px var(--palette-night, #161516);
     paint-order: stroke fill;
-    text-shadow: 0 2px 8px rgb(22 21 22 / 90%);
     pointer-events: none;
   }
 
@@ -57,7 +61,6 @@
     line-height: 1.4;
     text-align: center;
     text-wrap: balance;
-    text-shadow: 0 2px 8px rgb(22 21 22 / 90%);
     pointer-events: none;
     animation: personas-hint-pulse 2.4s ease-in-out 2;
   }
@@ -72,6 +75,23 @@
   .personas-status {
     position: relative;
     z-index: 1;
+  }
+
+  @media (min-width: 801px) {
+    .personas-title {
+      inset-block-start: auto;
+      inset-block-end: 14.5rem;
+    }
+
+    .personas-subtitle {
+      inset-block-start: auto;
+      inset-block-end: 12rem;
+    }
+
+    .personas-interaction-hint {
+      inset-block-start: auto;
+      inset-block-end: 10rem;
+    }
   }
 
   .personas-grid {

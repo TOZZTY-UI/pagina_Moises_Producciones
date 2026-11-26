@@ -2,19 +2,24 @@
 import Preloader from "../../components/ux/Preloader/Preloader.astro";
 import Footer from "../../components/layout/Footer/Footer.astro";
 import Menu from "../../components/ux/menu/menu.astro";
+import "./LandingPage.css";
 
 interface Props {
   title?: string;
+  description?: string;
   showPreloader?: boolean;
   personPage?: boolean;
+  sectionScroll?: boolean;
   navColor?: string;
   navMuted?: string;
 }
 
 const {
   title = "Moisés Producciones",
+  description = "Música en vivo y fotografía para bodas, celebraciones y eventos corporativos.",
   showPreloader = true,
   personPage = false,
+  sectionScroll = false,
   navColor,
   navMuted,
 } = Astro.props;
@@ -24,11 +29,17 @@ const navStyle = navColor || navMuted
   : undefined;
 ---
 
-<html lang="es">
+<html lang="es" class:list={{ "section-scroll-page": sectionScroll }}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={`https://producciones.saxeventos.cl${Astro.url.pathname}`} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={`https://producciones.saxeventos.cl${Astro.url.pathname}`} />
   </head>
   <body style={navStyle}>
 
@@ -42,7 +53,3 @@ const navStyle = navColor || navMuted
 </html>
 
 <script src="./LandingPage.ts"></script>
-
-<style>
-  @import "./LandingPage.css";
-</style>

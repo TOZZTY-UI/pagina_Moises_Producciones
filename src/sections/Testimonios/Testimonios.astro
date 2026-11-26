@@ -1,0 +1,24 @@
+---
+import './Testimonios.css';
+import testimonios from '../../data/testimonios.json';
+
+const publishedTestimonials = testimonios.filter((testimonial) => testimonial.published);
+---
+
+{publishedTestimonials.length > 0 && (
+  <section id="testimonios" class="conversion-section proof-section" aria-labelledby="proof-title" data-stagger-reveal>
+    <div class="proof-copy" data-reveal-item>
+      <h2 id="proof-title">La confianza empieza antes.</h2>
+      <p>Lo que dicen quienes ya vivieron su celebración con nosotros.</p>
+    </div>
+    <div class="proof-note" data-reveal-item>
+      {publishedTestimonials.map((testimonial) => (
+        <figure>
+          <span aria-hidden="true">“</span>
+          <blockquote>{testimonial.quote}</blockquote>
+          <figcaption>{testimonial.name} · {testimonial.event}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+)}
