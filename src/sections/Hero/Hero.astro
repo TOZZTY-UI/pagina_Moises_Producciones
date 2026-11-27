@@ -1,37 +1,29 @@
 ---
-import { getImage, Image } from 'astro:assets';
-import BackGround from '../../assets/hero.png';
-import MobileBackground from '../../assets/heroMovil.png';
-import TabletBackground from '../../assets/heroTablet.png';
+import { getImage, Image } from "astro:assets";
+import BackGround from "../../assets/hero.png";
+import MobileBackground from "../../assets/heroMovil.png";
+import TabletBackground from "../../assets/heroTablet.png";
 
-import './Hero.css';
+import "./Hero.css";
 
 const mobileHeroImage = await getImage({
   src: MobileBackground,
   width: 960,
-  format: 'webp',
+  format: "webp",
 });
 
 const tabletHeroImage = await getImage({
   src: TabletBackground,
   width: 1600,
-  format: 'webp',
+  format: "webp",
 });
 ---
 
-<section
-  id="inicio"
-  class="hero"
-  data-hero-intro
-  aria-labelledby="hero-title"
->
+<section id="inicio" class="hero" data-hero-intro aria-labelledby="hero-title">
   <!-- IMAGEN Y MÁSCARA DE REVELADO -->
   <div class="hero__image-mask">
     <picture class="hero__picture">
-      <source
-        media="(max-width: 600px)"
-        srcset={mobileHeroImage.src}
-      />
+      <source media="(max-width: 600px)" srcset={mobileHeroImage.src} />
       <source
         media="(min-width: 601px) and (max-width: 1100px)"
         srcset={tabletHeroImage.src}
@@ -50,17 +42,11 @@ const tabletHeroImage = await getImage({
   </div>
 
   <!-- DEGRADADO -->
-  <div
-    class="hero__scrim"
-    aria-hidden="true"
-  ></div>
+  <div class="hero__scrim" aria-hidden="true"></div>
   <span class="hero__camera-flash" aria-hidden="true"></span>
 
   <!-- DESTELLO DIAGONAL -->
-  <div
-    class="hero__sheen"
-    aria-hidden="true"
-  ></div>
+  <div class="hero__sheen" aria-hidden="true"></div>
 
   <!-- CONTENIDO PRINCIPAL -->
   <div class="hero__content">
@@ -73,15 +59,87 @@ const tabletHeroImage = await getImage({
   <!-- FOOTER -->
   <div class="hero__footer">
     <p class="hero__description">
-      Música en vivo y fotografía para bodas, celebraciones y eventos corporativos.
+      Música en vivo y fotografía para bodas, celebraciones y eventos
+      corporativos.
     </p>
 
-
-    <a class="hero__secondary-cta" href="#servicios">Ver qué hacemos</a>
+    <a class="cta" href="#servicios">
+      <span class="hover-underline-animation">Ver qué hacemos</span>
+      <svg
+        id="arrow-horizontal"
+        xmlns="http://www.w3.org/2000/svg"
+        width="30"
+        height="10"
+        viewBox="0 0 46 16"
+      >
+        <path
+          id="Path_10"
+          data-name="Path 10"
+          d="M8,0,6.545,1.455l5.506,5.506H-30V9.039H12.052L6.545,14.545,8,16l8-8Z"
+          transform="translate(30)"
+        ></path>
+      </svg>
+    </a>
   </div>
 </section>
 
 <script src="./Hero.ts"></script>
+
+<style>
+  .cta {
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+
+  .cta span {
+    padding-bottom: 7px;
+    letter-spacing: 4px;
+    font-size: 14px;
+    padding-right: 15px;
+    text-transform: uppercase;
+  }
+
+  .cta svg {
+    transform: translateX(-8px);
+    transition: all 0.3s ease;
+  }
+
+  .cta:hover svg {
+    transform: translateX(0);
+  }
+
+  .cta:active svg {
+    transform: scale(0.9);
+  }
+
+  .hover-underline-animation {
+    position: relative;
+    color: rgb(255, 255, 255);
+    padding-bottom: 20px;
+  }
+
+  .hover-underline-animation:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #ffffff;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+  }
+
+  .cta:hover .hover-underline-animation:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+  #arrow-horizontal{
+    fill: #ffffff;
+  }
+</style>
 
 <noscript>
   <style>

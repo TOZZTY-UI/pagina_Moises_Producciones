@@ -1,5 +1,6 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Lenis from 'lenis'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -14,6 +15,57 @@ const stage = carousel?.querySelector<HTMLElement>('.personas-stage')
 const intro = stage?.querySelector<HTMLElement>('.personas-intro')
 const badges = slides.map((slide) => slide.querySelector<HTMLElement>('[data-lanyard-badge]'))
 const details = stage ? [...stage.querySelectorAll<HTMLElement>('[data-personas-detail]')] : []
+const hero = document.querySelector<HTMLElement>('.hero')
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+let lenisCleanup: (() => void) | undefined
+
+if (carousel && !motionPreference.matches) {
+  const lenis = new Lenis({
+    anchors: true,
+    autoRaf: false,
+    lerp: 0.1,
+    smoothWheel: true,
+    syncTouch: false,
+  })
+  const updateScrollTrigger = () => ScrollTrigger.update()
+  const raf = (time: number) => lenis.raf(time * 1000)
+  const syncHeroScrollLock = () => {
+    const isLocked = document.documentElement.classList.contains('hero-scroll-locked')
+      || document.body.classList.contains('hero-scroll-locked')
+
+    if (isLocked) lenis.stop()
+    else lenis.start()
+  }
+  const handleIntroComplete = () => {
+    lenis.start()
+    ScrollTrigger.refresh()
+  }
+  const handleMotionPreferenceChange = () => {
+    if (motionPreference.matches) lenis.stop()
+    else lenis.start()
+  }
+
+  lenis.on('scroll', updateScrollTrigger)
+  gsap.ticker.add(raf)
+  gsap.ticker.lagSmoothing(0)
+  hero?.addEventListener('hero:intro-complete', handleIntroComplete)
+  motionPreference.addEventListener('change', handleMotionPreferenceChange)
+  syncHeroScrollLock()
+
+  lenisCleanup = () => {
+    hero?.removeEventListener('hero:intro-complete', handleIntroComplete)
+    motionPreference.removeEventListener('change', handleMotionPreferenceChange)
+    lenis.off('scroll', updateScrollTrigger)
+    gsap.ticker.remove(raf)
+    gsap.ticker.lagSmoothing(500, 33)
+    lenis.destroy()
+  }
+}
+
+if (lenisCleanup) {
+  document.addEventListener('astro:before-swap', lenisCleanup, { once: true })
+}
 
 if (carousel && stage && intro && track && slides.length > 1) {
   const media = gsap.matchMedia()
@@ -44,14 +96,24 @@ if (carousel && stage && intro && track && slides.length > 1) {
     gsap.set(details, { x: 0, autoAlpha: 0 })
     gsap.set(intro, { autoAlpha: 1 })
 
-    sequence.fromTo(track, { x: 0, scale: groupScale }, {
-      x: () => -(stage.clientWidth + track.offsetWidth * groupScale()) / 2,
-      scale: groupScale,
-      duration: 1,
-      ease: 'none',
-      onUpdate: () => pull(badges, -1),
-    })
-      .to(intro, { autoAlpha: 0, duration: 0.5 }, 0)
+    // Keep the section fully covering the viewport before the horizontal pass starts.
+    // One timeline unit maps to one viewport of scrolling below.
+    const coverDuration = 0.4
+    sequence
+      .to(track, {
+        x: 0,
+        scale: groupScale,
+        duration: coverDuration,
+        ease: 'none',
+      })
+      .fromTo(track, { x: 0, scale: groupScale }, {
+        x: () => -(stage.clientWidth + track.offsetWidth * groupScale()) / 2,
+        scale: groupScale,
+        duration: 1,
+        ease: 'none',
+        onUpdate: () => pull(badges, -1),
+      })
+      .to(intro, { autoAlpha: 0, duration: 0.5 }, coverDuration)
       // The gallery is fully gone before the individual pass starts. Reset
       // every slide's transform as well as its visibility so no old slot
       // position leaks into the next phase.
@@ -222,7 +284,7 @@ if (track && slides.length > 1 && controls && previousButton && nextButton && st
     if (Math.abs(left - from) < 1) {
       // The user reversed direction before the earlier scroll got underway.
       pending = undefined
-      track.scrollTo({ left, behavior: 'instant' })
+      track.scrollTo({ left, behavior: 'auto' })
       syncSelection(index, true)
       return
     }
@@ -241,7 +303,7 @@ if (track && slides.length > 1 && controls && previousButton && nextButton && st
   track.addEventListener('scroll', () => {
     if (!mobile.matches) return
     if (!reducedMotion.matches && !pullFrame) pullFrame = requestAnimationFrame(pullVisibleBadges)
-    // Lenis can consume scrollend in capture, even in browsers that support it.
+    // Keep a fallback timer for browsers without reliable scrollend support.
     window.clearTimeout(settleTimer)
     settleTimer = window.setTimeout(settle, 160)
   }, { passive: true })
@@ -256,7 +318,7 @@ if (track && slides.length > 1 && controls && previousButton && nextButton && st
       const index = Math.max(0, current)
       requestAnimationFrame(() => {
         if (!mobile.matches) return
-        track.scrollTo({ left: slides[index].offsetLeft, behavior: 'instant' })
+        track.scrollTo({ left: slides[index].offsetLeft, behavior: 'auto' })
         syncSelection(index)
         resetPull()
       })

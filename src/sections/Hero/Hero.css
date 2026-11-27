@@ -77,6 +77,12 @@
   will-change: clip-path;
 }
 
+/* El contenido entra solo cuando termina el revelado de la imagen. */
+.hero[data-hero-intro] .hero__title-wrap,
+.hero[data-hero-intro] .hero__footer {
+  opacity: 0;
+}
+
 
 /* ========================================
    IMAGEN DE FONDO

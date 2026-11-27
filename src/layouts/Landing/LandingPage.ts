@@ -1,73 +1,25 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const setupLenis = () => {
-  if (
-    !document.documentElement.classList.contains('section-scroll-page')
-    || window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) return;
+const curtain = document.querySelector('#page-curtain');
+let animating = false;
+let curtainAnimation: Animation | null = null;
 
-  const lenis = new Lenis({
-    autoRaf: false,
-    anchors: true,
-    smoothWheel: true,
-  });
+const resetCurtain = () => {
+  if (!curtain) return;
 
-  const scrollSections = document.querySelectorAll<HTMLElement>(
-    'main[data-section-scroller] > section:not(.personas-carousel)',
-  );
-  let blurReset: gsap.core.Tween | null = null;
-  const blurWhileScrolling = ({ velocity }: { velocity: number }) => {
-    const blur = Math.min(3.5, Math.abs(velocity) * 0.012);
-    gsap.set(scrollSections, { filter: `blur(${blur}px)` });
-    blurReset?.kill();
-    blurReset = gsap.to(scrollSections, {
-      filter: 'blur(0px)',
-      duration: 0.28,
-      ease: 'power2.out',
-      overwrite: 'auto',
-    });
-  };
-
-  lenis.on('scroll', ScrollTrigger.update);
-  if (scrollSections.length) lenis.on('scroll', blurWhileScrolling);
-
-  const updateLenis = (time: number) => {
-    lenis.raf(time * 1000);
-  };
-
-  gsap.ticker.add(updateLenis);
-  gsap.ticker.lagSmoothing(0);
-
-  return () => {
-    gsap.ticker.remove(updateLenis);
-    lenis.off('scroll', blurWhileScrolling);
-    lenis.destroy();
-    blurReset?.kill();
-    gsap.ticker.lagSmoothing(500, 33);
-  };
+  curtainAnimation?.cancel();
+  curtainAnimation = null;
+  curtain.style.clipPath = 'polygon(-60% 0, -30% 0, -5% 100%, -60% 100%)';
+  animating = false;
 };
 
-  const curtain = document.querySelector('#page-curtain');
-  let animating = false;
-  let curtainAnimation: Animation | null = null;
-
-  const resetCurtain = () => {
-    if (!curtain) return;
-
-    curtainAnimation?.cancel();
-    curtainAnimation = null;
-    curtain.style.clipPath = 'polygon(-60% 0, -30% 0, -5% 100%, -60% 100%)';
-    animating = false;
-  };
-
-  // pageshow también se dispara cuando el navegador restaura la página
-  // desde el back-forward cache. La cortina no debe conservar el estado
-  // cubierto de la navegación anterior.
-  window.addEventListener('pageshow', resetCurtain);
+// pageshow también se dispara cuando el navegador restaura la página
+// desde el back-forward cache. La cortina no debe conservar el estado
+// cubierto de la navegación anterior.
+window.addEventListener('pageshow', resetCurtain);
 
   const revealSections = () => {
     const sections = document.querySelectorAll<HTMLElement>('[data-stagger-reveal]');
@@ -94,12 +46,12 @@ const setupLenis = () => {
         transition
           .fromTo(
             section,
-            { autoAlpha: 0.45, y: 48, scale: 0.985 },
-            { autoAlpha: 1, y: 0, scale: 1, duration: 0.42, ease: 'power2.out' },
+            { autoAlpha: 0.45 },
+            { autoAlpha: 1, duration: 0.42, ease: 'power2.out' },
           )
           .to(
             section,
-            { autoAlpha: 0.58, y: -36, scale: 0.985, duration: 0.58, ease: 'none' },
+            { autoAlpha: 0.58, duration: 0.58, ease: 'none' },
           );
       });
 
@@ -130,11 +82,9 @@ const setupLenis = () => {
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      setupLenis();
       revealSections();
     }, { once: true });
   } else {
-    setupLenis();
     revealSections();
   }
 

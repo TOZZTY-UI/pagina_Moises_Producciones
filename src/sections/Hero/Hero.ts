@@ -11,7 +11,7 @@ if (hero && !hero.dataset.heroAnimationReady) {
       '',
       `${window.location.pathname}${window.location.search}`
     );
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }
 
   const sheen = hero.querySelector<HTMLElement>(
@@ -47,10 +47,6 @@ if (hero && !hero.dataset.heroAnimationReady) {
     const root = document.documentElement;
     const body = document.body;
     const cta = hero.querySelector<HTMLAnchorElement>('.hero__cta');
-    const reduceMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    );
-
     let introFinished = false;
     let pendingLink: HTMLAnchorElement | undefined;
 
@@ -62,7 +58,7 @@ if (hero && !hero.dataset.heroAnimationReady) {
         history.pushState(history.state, '', location.pathname + location.search + link.hash);
       }
       target.scrollIntoView({
-        behavior: reduceMotion.matches ? 'auto' : 'smooth',
+        behavior: 'auto',
         block: 'start',
       });
     };
@@ -91,10 +87,10 @@ if (hero && !hero.dataset.heroAnimationReady) {
 
       sheenFadeDuration: 0.2,
 
-      titleStart: 1.85,
-      titleDuration: 0.8,
+       titleStart: 2.05,
+       titleDuration: 0.8,
 
-      footerStart: 2.15,
+       footerStart: 2.35,
       footerDuration: 0.75,
     };
 
@@ -163,7 +159,7 @@ if (hero && !hero.dataset.heroAnimationReady) {
         let disposed = false;
         let cameraFlashPlayback:
           ReturnType<typeof playCameraFlash> | undefined;
-        let lastTopFlash = 0;
+        let ambientFlashTimer: number | undefined;
 
         const playFlash = () => {
           if (disposed || !introFinished || document.hidden || !flash || !exposure) return;
@@ -171,19 +167,25 @@ if (hero && !hero.dataset.heroAnimationReady) {
           cameraFlashPlayback = playCameraFlash(flash, exposure, image);
         };
 
-        const heroEntryObserver = new IntersectionObserver(([entry]) => {
-          if (!entry.isIntersecting || window.scrollY > hero.offsetHeight * 0.22) return;
-          const now = performance.now();
-          if (now - lastTopFlash < 1200) return;
-          lastTopFlash = now;
-          playFlash();
-        }, { threshold: 0.8 });
-        heroEntryObserver.observe(hero);
+        const scheduleAmbientFlashes = () => {
+          const scheduleNext = () => {
+            if (disposed) return;
+
+            const delay = 650 + Math.random() * 1800;
+            ambientFlashTimer = window.setTimeout(() => {
+              playFlash();
+              scheduleNext();
+            }, delay);
+          };
+
+          scheduleNext();
+        };
 
         const shootCameraFlash = () => {
           const afterFlash = () => {
             if (disposed) return;
             finishIntro();
+            scheduleAmbientFlashes();
           };
           cameraFlashPlayback = flash && exposure ? playCameraFlash(flash, exposure, image) : undefined;
 
@@ -208,14 +210,14 @@ if (hero && !hero.dataset.heroAnimationReady) {
         });
 
         gsap.set(title, {
-          autoAlpha: 1,
-          y: 0,
-          filter: 'none',
+          autoAlpha: 0,
+          y: 18,
+          filter: 'blur(8px)',
         });
 
         gsap.set(footer, {
-          autoAlpha: 1,
-          y: 0,
+          autoAlpha: 0,
+          y: 14,
         });
 
         gsap.set(image, {
@@ -359,7 +361,9 @@ if (hero && !hero.dataset.heroAnimationReady) {
           window.removeEventListener('preloader:complete', startReveal);
           document.removeEventListener('visibilitychange', handleVisibilityChange);
           cameraFlashPlayback?.cancel();
-          heroEntryObserver.disconnect();
+          if (ambientFlashTimer !== undefined) {
+            window.clearTimeout(ambientFlashTimer);
+          }
           timeline.kill();
           finishIntro();
         };

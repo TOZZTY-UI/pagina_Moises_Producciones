@@ -16,6 +16,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
   id="personas"
   class="personas-carousel"
   role="region"
+  tabindex="-1"
   aria-labelledby="personas-title"
   aria-describedby="personas-subtitle"
   aria-roledescription="carousel"
@@ -37,8 +38,15 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
         Conoce al equipo detrás de cada experiencia.
       </p>
       <p class="personas-interaction-hint" data-reveal-item aria-hidden="true">
-        Toca una tarjeta para descubrir su perfil
+        Desliza para descubrir su perfil
       </p>
+
+      <div class="scrolldown personas-scroll-hint" aria-hidden="true">
+        <div class="chevrons">
+          <div class="chevrondown"></div>
+          <div class="chevrondown"></div>
+        </div>
+      </div>
     </div>
 
     <div class="personas-controls" role="group" aria-label="Controles de personas">
@@ -92,7 +100,6 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
       class="personas-grid"
       data-personas-track
       data-view="group"
-      data-lenis-prevent
       tabindex="0"
       role="group"
       aria-label="Credenciales"

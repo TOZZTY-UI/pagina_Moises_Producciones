@@ -1,6 +1,7 @@
 
 ---
 import { navigation } from '../../../lib/navigation';
+import { ResponsiveNavbar } from '../../ui/navigation-menu';
 
 interface NavItem {
   name: string;
@@ -10,95 +11,28 @@ interface NavItem {
 
 export interface Props {
   items?: NavItem[];
-  brand?: string;
-  logo?: string;
   compact?: boolean;
 }
 
 const {
-  brand = "SaxEventos",
-  logo = "/icons/logo.webp",
   compact = false,
   items = navigation.map(({ label, href, sectionId }) => ({ name: label, href, sectionId })),
 } = Astro.props;
 
-const visibleItems = compact ? items.filter((item) => !item.sectionId) : items;
+const menuItems = [
+  ...items,
+  ...(items.some((item) => item.href === "/contacto")
+    ? []
+    : [{ name: "Contacto", href: "/contacto" }]),
+];
+
+const visibleItems = compact
+  ? menuItems.filter((item) => !item.sectionId)
+  : menuItems;
 ---
 
-<resizable-navbar data-compact={compact ? '' : undefined}>
-  <header class="navbar">
-    <div class="nav-container">
-
-      <!-- Logo -->
-      <a href="/" class="brand">
-        <img src={logo} alt="" width="32" height="32" />
-        <span>{brand}</span>
-      </a>
-
-      <!-- Navegación escritorio -->
-      <nav class="nav-links" aria-label="Navegación principal" hidden={compact}>
-        <span class="nav-indicator" aria-hidden="true"></span>
-
-        {
-              visibleItems.map((item) => (
-            <a href={item.href} class="nav-link" data-section={item.sectionId}>
-              {item.name}
-            </a>
-          ))
-        }
-      </nav>
-
-      <!-- Botones escritorio -->
-      <div class="nav-actions">
-        <a href="/contacto" class="button primary">
-          Contactar
-        </a>
-
-      </div>
-
-      <!-- Botón móvil -->
-      <button
-        class="menu-toggle"
-        type="button"
-        aria-label="Abrir menú"
-        aria-expanded="false"
-        aria-controls="mobile-navigation"
-      >
-        <span></span>
-        <span></span>
-      </button>
-
-      <!-- Navegación móvil -->
-      <div
-        class="mobile-menu"
-        id="mobile-navigation"
-        inert
-      >
-        <nav class="mobile-content" aria-label="Navegación móvil">
-          {
-            items.map((item) => (
-              <a href={item.href} class="mobile-link" data-section={item.sectionId}>
-                {item.name}
-              </a>
-            ))
-          }
-
-          <a href="/contacto" class="button secondary">
-            Contactar
-          </a>
-
-          <a href="/cotizar" class="button primary">
-            Cotizar
-          </a>
-        </nav>
-      </div>
-
-    </div>
-  </header>
-</resizable-navbar>
-
-<style>
-@import './menu.css';
-</style>
-
-<script src="./menu.ts"></script>
+<ResponsiveNavbar
+  client:load
+  items={visibleItems}
+  compact={compact}
+/>
