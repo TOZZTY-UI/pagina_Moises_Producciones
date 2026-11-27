@@ -46,6 +46,7 @@ if (hero && !hero.dataset.heroAnimationReady) {
 
     const root = document.documentElement;
     const body = document.body;
+    body.classList.add('hero-intro-pending');
     const cta = hero.querySelector<HTMLAnchorElement>('.hero__cta');
     let introFinished = false;
     let pendingLink: HTMLAnchorElement | undefined;
@@ -113,6 +114,7 @@ if (hero && !hero.dataset.heroAnimationReady) {
     const finishIntro = () => {
       if (introFinished) return;
       introFinished = true;
+      body.classList.remove('hero-intro-pending');
       hero.removeAttribute('data-hero-intro');
       setScrollLock(false);
       hero.dispatchEvent(new Event('hero:intro-complete'));

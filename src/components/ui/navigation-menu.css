@@ -6,11 +6,20 @@
   justify-content: center;
   padding: .4rem .4rem 0;
   pointer-events: none;
-  transition: transform 220ms ease;
+  transition: transform 500ms cubic-bezier(.22, 1, .36, 1), opacity 500ms ease;
 }
 
 .site-header[data-hidden="true"] {
   transform: translateY(-120%);
+}
+
+/* The hero reveals the navigation with the copy: from slightly above, down
+   into its final position instead of appearing from below. */
+body.hero-intro-pending .site-header,
+body:has(.hero[data-hero-intro]) .site-header {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-1.5rem);
 }
 
 .site-header__inner {
