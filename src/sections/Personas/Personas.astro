@@ -120,7 +120,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
             frontImage={resolveImage(person.LanyardBadgefront)}
             frontImageHover={resolveImage(person.LanyardBadgehover)}
             frontImageAlt={person.frontImageAlt}
-            profileHref={`/personas/${person.slug}`}
+            profileHref={`/${person.slug}`}
             strapText="hola"
             strapLabel="PRODUCCIONES"
             strapColor="#06070a"
@@ -143,7 +143,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
           <h3>{person.name}</h3>
           <p class="personas-detail-role">{person.role}</p>
           <p class="personas-detail-description">{person.description}</p>
-          <a class="personas-detail-link" href={`/personas/${person.slug}`}>
+          <a class="personas-detail-link" href={`/${person.slug}`}>
             Ver perfil <span aria-hidden="true">↗</span>
           </a>
         </article>

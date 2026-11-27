@@ -147,6 +147,45 @@ body:has(.hero[data-hero-intro]) .site-header {
   transform: translateY(-1px);
 }
 
+.dcf-bar__social {
+  position: absolute;
+  top: 50%;
+  left: 1.45rem;
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translateY(-50%);
+}
+
+.dcf-bar__social a {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  color: #dcdcdc;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.dcf-bar__social a:hover,
+.dcf-bar__social a:focus-visible {
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.dcf-bar__social .social-icon,
+.dcf-bar__social .social-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dcf-bar__social .social-icon svg path {
+  fill: currentColor;
+}
+
 .menu-toggle {
   display: none;
   align-items: center;
@@ -235,6 +274,15 @@ body:has(.hero[data-hero-intro]) .site-header {
   .site-contact {
     width: 100%;
     margin: .35rem 0 0;
+  }
+
+  .dcf-bar__social {
+    position: static;
+    justify-content: center;
+    margin: .35rem 0 0;
+    padding-top: .6rem;
+    border-top: 1px solid rgb(255 255 255 / 12%);
+    transform: none;
   }
 }
 

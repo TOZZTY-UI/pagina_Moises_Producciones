@@ -1,10 +1,9 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import type { ImageMetadata } from 'astro';
 import LandingPage from '../../layouts/Landing/LandingPage.astro';
 import personas from '../../data/personas.json';
 import Blob from '../../components/ux/blob/blob.astro';
-import './[slug].css';
+import './index.css';
 
 const profileImages = import.meta.glob('../../assets/**/*.{webp,jpg,jpeg,png}', {
   eager: true,

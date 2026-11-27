@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Menu, X } from "lucide-react";
 
+import socialLinks from "../../../data/socialLinks.json";
 import "./navigation-menu.css";
 
 export interface NavigationMenuItem {
@@ -203,11 +204,6 @@ export function ResponsiveNavbar({
       ref={rootRef}
     >
       <div className="site-header__inner">
-        <a className="site-logo" href="/" aria-label="MOISÉS, inicio">
-          <span className="site-logo__mark" aria-hidden="true">M</span>
-          <span>MOISÉS</span>
-        </a>
-
         <button
           ref={menuButtonRef}
           className="menu-toggle"
@@ -260,6 +256,28 @@ export function ResponsiveNavbar({
             >
               {contactItem.name}
             </a>
+          )}
+
+          {socialLinks.length > 0 && (
+            <ul className="dcf-bar__social" aria-label="Redes sociales">
+              {socialLinks.map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.url}
+                    aria-label={link.name}
+                    title={link.name}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span
+                      className="social-icon"
+                      dangerouslySetInnerHTML={{ __html: link.icon }}
+                      aria-hidden="true"
+                    />
+                  </a>
+                </li>
+              ))}
+            </ul>
           )}
         </nav>
       </div>

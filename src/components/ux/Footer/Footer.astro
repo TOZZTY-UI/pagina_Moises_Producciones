@@ -66,31 +66,18 @@ const doodles = ["♪", "♫", "♩", "♬", "♪", "♫", "♩", "♬"];
   <br />
   <div class="dcf-bar" data-reveal-item>
     <p>{copyright}</p>
-    {
-      socialLinks.length > 0 && (
-        <ul class="dcf-bar__social" aria-label="Social media">
-          {socialLinks.map((link) => (
-            <li>
-              <a href={link.url} aria-label={link.name} title={link.name}>
-                <span class="social-icon" set:html={link.icon} aria-hidden="true" />
-              </a>
-            </li>
-          ))}
-        </ul>
-      )
-    }
+    
     {
       backToTop && (
 <button>
   <div class="text">
-    <span>Back</span>
-    <span>to</span>
-    <span>top</span>
+    <span>Subir</span>
+    <span>arriba</span>
   </div>
   <div class="clone">
-    <span>Back</span>
-    <span>to</span>
-    <span>top</span>
+    <span>Subir</span>
+    <span>arriba</span>
+
   </div>
   <svg
     stroke-width="2"
