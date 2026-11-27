@@ -11,6 +11,7 @@ const imageUrls = import.meta.glob("../../assets/**/*", {
 }) as Record<string, string>;
 
 const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
+const profileHref = (slug: string) => `/${encodeURIComponent(slug)}`;
 ---
 <section
   id="personas"
@@ -120,7 +121,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
             frontImage={resolveImage(person.LanyardBadgefront)}
             frontImageHover={resolveImage(person.LanyardBadgehover)}
             frontImageAlt={person.frontImageAlt}
-            profileHref={`/${person.slug}`}
+            profileHref={profileHref(person.slug)}
             strapText="hola"
             strapLabel="PRODUCCIONES"
             strapColor="#06070a"
@@ -143,7 +144,7 @@ const resolveImage = (path?: string) => (path ? imageUrls[path] : undefined);
           <h3>{person.name}</h3>
           <p class="personas-detail-role">{person.role}</p>
           <p class="personas-detail-description">{person.description}</p>
-          <a class="personas-detail-link" href={`/${person.slug}`}>
+          <a class="personas-detail-link" href={profileHref(person.slug)}>
             Ver perfil <span aria-hidden="true">↗</span>
           </a>
         </article>

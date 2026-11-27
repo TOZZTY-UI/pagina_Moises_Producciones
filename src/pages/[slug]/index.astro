@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import LandingPage from '../../layouts/Landing/LandingPage.astro';
 import personas from '../../data/personas.json';
 import Blob from '../../components/ux/blob/blob.astro';
+import Galeria from '../../sections/Galeria/Galeria.astro';
 import './index.css';
 
 const profileImages = import.meta.glob('../../assets/**/*.{webp,jpg,jpeg,png}', {
@@ -39,7 +40,6 @@ const { persona } = Astro.props;
     >
     <div class="person-page__layout">
       <div class="person-page__copy" data-reveal-item>
-        <a class="back-link" href="/" data-person-back>← Volver al inicio</a>
         <p class="person-label">{persona.title}</p>
         <h1>{persona.name}</h1>
         <p class="role">{persona.role}</p>
@@ -54,6 +54,7 @@ const { persona } = Astro.props;
       </div>
     </div>
   </main>
+  <Galeria personSlug={persona.slug} />
 </LandingPage>
 
 <script src="../../scripts/person-page.ts"></script>

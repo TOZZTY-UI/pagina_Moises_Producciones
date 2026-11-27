@@ -113,43 +113,52 @@ export function ResponsiveNavbar({
 
     if (!sections.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleSection = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    let frame = 0;
 
-        if (!visibleSection) return;
+    const syncActiveSection = () => {
+      frame = 0;
+      const marker = window.innerHeight * 0.45;
+      const activeSection = sections
+        .filter(({ element }) => {
+          const rect = element.getBoundingClientRect();
+          return rect.top <= marker && rect.bottom >= marker;
+        })
+        .at(-1);
 
-        const section = sections.find(
-          ({ element }) => element === visibleSection.target,
+      const nextHash =
+        activeSection && activeSection.item.sectionId !== "inicio"
+          ? `#${activeSection.item.sectionId}`
+          : "";
+      const nextActiveHref = activeSection
+        ? `${window.location.pathname}#${activeSection.item.sectionId}`
+        : "";
+
+      if (window.location.hash !== nextHash) {
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${nextHash}`,
         );
-        if (!section) return;
+      }
 
-        const nextHash =
-          section.item.sectionId === "inicio"
-            ? ""
-            : `#${section.item.sectionId}`;
+      setActiveHref((current) =>
+        current === nextActiveHref ? current : nextActiveHref,
+      );
+    };
 
-        if (window.location.hash !== nextHash) {
-          window.history.replaceState(
-            null,
-            "",
-            `${window.location.pathname}${nextHash}`,
-          );
-        }
+    const requestSync = () => {
+      if (!frame) frame = window.requestAnimationFrame(syncActiveSection);
+    };
 
-        setActiveHref(
-          nextHash
-            ? `${window.location.pathname}${nextHash}`
-            : "",
-        );
-      },
-      { rootMargin: "-35% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75] },
-    );
+    syncActiveSection();
+    window.addEventListener("scroll", requestSync, { passive: true });
+    window.addEventListener("resize", requestSync, { passive: true });
 
-    sections.forEach(({ element }) => observer.observe(element));
-    return () => observer.disconnect();
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestSync);
+      window.removeEventListener("resize", requestSync);
+    };
   }, [visibleItems]);
 
   React.useEffect(() => {
@@ -188,12 +197,21 @@ export function ResponsiveNavbar({
   }, [isOpen, isWide]);
 
   const isCurrentItem = (item: NavigationMenuItem) => {
+    if (item.sectionId) {
+      return activeHref === `${pathname}#${item.sectionId}`;
+    }
     if (item.href.includes("#")) return activeHref === item.href;
     return Boolean(pathname && !activeHref && item.href === pathname);
   };
 
   const closeAfterNavigation = (item: NavigationMenuItem) => {
-    setActiveHref(item.href.includes("#") ? item.href : "");
+    setActiveHref(
+      item.sectionId
+        ? `${window.location.pathname}#${item.sectionId}`
+        : item.href.includes("#")
+          ? item.href
+          : "",
+    );
     setIsOpen(false);
   };
 

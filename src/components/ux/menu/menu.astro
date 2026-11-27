@@ -19,12 +19,14 @@ const {
   items = navigation.map(({ label, href, sectionId }) => ({ name: label, href, sectionId })),
 } = Astro.props;
 
-const menuItems = [
-  ...items,
-  ...(items.some((item) => item.href === "/contacto")
-    ? []
-    : [{ name: "Contacto", href: "/contacto" }]),
-];
+const menuItems = compact
+  ? [{ name: "Inicio", href: "/" }]
+  : [
+      ...items,
+      ...(items.some((item) => item.href === "/contacto")
+        ? []
+        : [{ name: "Contacto", href: "/contacto" }]),
+    ];
 
 const visibleItems = compact
   ? menuItems.filter((item) => !item.sectionId)

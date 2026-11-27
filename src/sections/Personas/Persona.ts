@@ -289,7 +289,22 @@ if (track && slides.length > 1 && controls && previousButton && nextButton && st
       return
     }
     pending = { index, from }
-    track.scrollTo({ left })
+    // Update the controls immediately so a quick second press is based on the
+    // destination card, not on the still-moving scroll position.
+    syncSelection(index, true)
+    requestAnimationFrame(() => {
+      if (!mobile.matches) return
+      track.scrollTo({
+        left,
+        // Keep the control deterministic. Native snap still provides the
+        // final alignment, while smooth scrolling can be interrupted by a
+        // second press on some mobile browsers.
+        behavior: 'auto',
+      })
+      if (Math.abs(track.scrollLeft - left) > 1) track.scrollLeft = left
+    })
+    window.clearTimeout(settleTimer)
+    settleTimer = window.setTimeout(settle, 220)
   }
 
   previousButton.addEventListener('click', () => step(-1))

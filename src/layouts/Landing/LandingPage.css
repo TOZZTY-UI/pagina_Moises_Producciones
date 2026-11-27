@@ -444,3 +444,11 @@ html.section-scroll-page body {
     transition: none;
   }
 }
+body[data-protected-page] img,
+body[data-protected-page] a {
+  -webkit-user-drag: none;
+}
+
+body[data-protected-page] img {
+  user-select: none;
+}

@@ -70,10 +70,38 @@ document.querySelectorAll<HTMLElement>("[data-footer]").forEach((footer) => {
         }, 2600);
       });
     });
-  footer.querySelector("[data-to-top]")?.addEventListener("click", () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "auto",
-    });
+  const toTop = footer.querySelector<HTMLButtonElement>("[data-to-top]");
+
+  toTop?.addEventListener("click", () => {
+    const startY = window.scrollY;
+    const distance = Math.abs(startY);
+
+    if (distance === 0) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    const duration = Math.min(1500, Math.max(650, distance * 0.55));
+    const startTime = performance.now();
+
+    const easeInOutCubic = (progress: number) =>
+      progress < 0.5
+        ? 4 * progress ** 3
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    const animate = (currentTime: number) => {
+      const progress = Math.min(1, (currentTime - startTime) / duration);
+      const easedProgress = easeInOutCubic(progress);
+
+      window.scrollTo(0, startY * (1 - easedProgress));
+
+      if (progress < 1) {
+        window.requestAnimationFrame(animate);
+      }
+    };
+
+    window.requestAnimationFrame(animate);
   });
 });

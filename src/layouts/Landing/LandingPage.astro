@@ -41,7 +41,7 @@ const navStyle = navColor || navMuted
     <meta property="og:type" content="website" />
     <meta property="og:url" content={`https://producciones.saxeventos.cl${Astro.url.pathname}`} />
   </head>
-  <body style={navStyle}>
+  <body style={navStyle} data-protected-page>
 
     {showPreloader && <Preloader />}
     <Menu compact={personPage} />

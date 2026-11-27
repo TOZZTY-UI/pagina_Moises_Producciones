@@ -10,6 +10,12 @@ export default defineConfig({
     redirects: true,
   },
   compressHTML: true,
+  redirects: {
+    '/personas/saxeventos': '/saxeventos',
+    '/personas/felipe-montupil': '/felipe-montupil',
+    '/personas/dgviolinista': '/dgviolinista',
+    '/personas/manudelrey': '/manudelrey',
+  },
   vite: {
     plugins: [tailwindcss()],
     build: {

@@ -1,0 +1,105 @@
+---
+import { getImage, type ImageMetadata } from "astro:assets";
+import "./Galeria.css";
+import personas from "../../data/personas.json";
+
+interface Props {
+  personSlug: string;
+}
+
+const { personSlug } = Astro.props;
+const folders: Record<string, string> = {
+  saxeventos: "MoisesLarenas",
+  "felipe-montupil": "FelipeMontupil",
+  dgviolinista: "DGviolinista",
+  manudelrey: "Manudelrey",
+};
+const person = personas.find((item) => item.slug === personSlug);
+const folder = folders[personSlug];
+const normalizeAssetPath = (path: string) =>
+  path.replace(/\\/g, "/").replace(/^.*?assets\//, "");
+const excludedImages = new Set(
+  [person?.profileImage, person?.LanyardBadgefront, person?.LanyardBadgehover]
+    .filter((path): path is string => Boolean(path))
+    .map(normalizeAssetPath),
+);
+
+const imageModules = import.meta.glob("../../assets/**/*.{webp,jpg,jpeg,png}", {
+  eager: true,
+  import: "default",
+}) as Record<string, ImageMetadata>;
+
+const images = Object.entries(imageModules)
+  .filter(
+    ([path]) =>
+      folder &&
+      path.includes(`/${folder}/images/`) &&
+      !excludedImages.has(normalizeAssetPath(path)),
+  )
+  .map(([path, src]) => ({
+    source: src,
+    alt: path.split("/").pop()?.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ") ?? "Momento de un evento",
+  }));
+
+const optimizedImages = await Promise.all(
+  images.map(async (image) => {
+    const optimized = await getImage({
+      src: image.source,
+      width: 1600,
+      quality: 76,
+      format: "webp",
+    });
+
+    return {
+      src: optimized.src,
+      alt: image.alt,
+    };
+  }),
+);
+---
+
+<section
+  id={`galeria-${personSlug}`}
+  class="photo-gallery"
+  data-protected-gallery
+  aria-labelledby={`photo-gallery-title-${personSlug}`}
+>
+  <header class="photo-gallery__header">
+    <p>{person?.role ?? "Registro visual"}</p>
+    <h2 id={`photo-gallery-title-${personSlug}`}>Momentos reales</h2>
+  </header>
+
+  <div class="photo-gallery__grid">
+    {optimizedImages.map((image, index) => (
+      <button
+        type="button"
+        class="photo-gallery__card"
+        data-gallery-trigger
+        data-gallery-src={image.src}
+        data-gallery-alt={image.alt}
+        aria-label={`Ampliar fotografía ${index + 1}`}
+      >
+        <img src={image.src} alt={image.alt} loading={index < 6 ? "eager" : "lazy"} decoding="async" />
+        <span class="photo-gallery__watermark" aria-hidden="true">Moisés Producciones</span>
+      </button>
+    ))}
+  </div>
+
+  <dialog
+    class="photo-gallery__dialog"
+    data-gallery-dialog
+    closedby="any"
+    aria-labelledby={`photo-gallery-dialog-title-${personSlug}`}
+  >
+    <h2 id={`photo-gallery-dialog-title-${personSlug}`} class="photo-gallery__dialog-title">
+      {person?.name ?? "Fotografía"}
+    </h2>
+    <form method="dialog">
+      <button type="submit" class="photo-gallery__close" aria-label="Cerrar fotografía">×</button>
+    </form>
+    <img data-gallery-dialog-image src="" alt="" />
+    <span class="photo-gallery__dialog-watermark" aria-hidden="true">Moisés Producciones</span>
+  </dialog>
+</section>
+
+<script src="./Galeria.ts"></script>

@@ -1,1 +1,28 @@
 /* La composición compartida vive en layouts/Landing/LandingPage.css. */
+
+.services-section {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.services-section::before {
+  position: absolute;
+  inset: -10rem 0 auto;
+  left: calc((100% - 100vw) / 2);
+  z-index: -1;
+  width: 100vw;
+  height: 10rem;
+  background: linear-gradient(
+    180deg,
+    rgb(142 26 35 / 0) 0%,
+    rgb(142 26 35 / .28) 58%,
+    var(--palette-night, #161516) 100%
+  );
+  content: "";
+  pointer-events: none;
+}

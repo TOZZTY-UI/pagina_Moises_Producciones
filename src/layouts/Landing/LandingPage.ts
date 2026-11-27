@@ -3,6 +3,45 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const isEditableTarget = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable ||
+    target.matches('input, textarea, select, [contenteditable="true"]'));
+
+document.addEventListener('contextmenu', (event) => {
+  if (!isEditableTarget(event.target)) {
+    event.preventDefault();
+  }
+});
+
+document.addEventListener('dragstart', (event) => {
+  if (!isEditableTarget(event.target)) {
+    event.preventDefault();
+  }
+});
+
+document.addEventListener('copy', (event) => {
+  if (!isEditableTarget(event.target)) {
+    event.preventDefault();
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (isEditableTarget(event.target)) return;
+
+  const modifier = event.ctrlKey || event.metaKey;
+  const key = event.key.toLowerCase();
+  const isDevToolsShortcut =
+    event.key === 'F12' ||
+    (modifier && event.shiftKey && ['i', 'j', 'c'].includes(key)) ||
+    (modifier && key === 'u');
+
+  if (isDevToolsShortcut) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+});
+
 const curtain = document.querySelector('#page-curtain');
 let animating = false;
 let curtainAnimation: Animation | null = null;
